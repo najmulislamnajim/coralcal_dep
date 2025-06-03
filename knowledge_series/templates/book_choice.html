@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doctor Wishes Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .thumbnail {
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .thumbnail.selected {
+      border: 2px solid #3b82f6;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4">
+  <header class="bg-white shadow w-full p-4 mb-6">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <img src="{% static 'core/images/CoralCal-kit.png' %}" alt="Logo" class="h-10 sm:h-12">
+      <a href="{% url 'logout' %}" 
+        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 inline-block">
+        Logout
+      </a>
+
+    </div>
+  </header>
+
+  <main class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 sm:p-10">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Doctor Wishes Form</h2>
+
+    {% if messages %}
+      <div class="mb-4">
+        {% for message in messages %}
+          <div class="p-3 rounded text-sm text-white {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500{% else %}bg-gray-500{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form id="uploadForm" method="post">
+      {% csrf_token %}
+
+      <!-- Doctor ID -->
+      <div class="mb-5">
+        <label for="dr_id" class="block text-sm font-medium text-gray-700 mb-1">Doctor ID</label>
+        <input id="dr_id" name="dr_id" type="text" required
+          class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"/>
+      </div>
+
+      <!-- Doctor Name -->
+      <div class="mb-6">
+        <label for="dr_name" class="block text-sm font-medium text-gray-700 mb-1">Doctor Name</label>
+        <input id="dr_name" name="dr_name" type="text" required
+          class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"/>
+      </div>
+
+      <!-- Book Selection -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Book</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image1')">
+            <img src="{% static 'images/book1.jpg' %}" alt="Book-1" class="object-cover w-full h-32 sm:h-36">
+            <p class="text-center text-xs text-gray-600 mt-2">Book-1</p>
+          </div>
+          <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image2')">
+            <img src="{% static 'images/book2.jpg' %}" alt="Book-2" class="object-cover w-full h-32 sm:h-36">
+            <p class="text-center text-xs text-gray-600 mt-2">Book-2</p>
+          </div>
+          <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image3')">
+            <img src="{% static 'images/book3.jpg' %}" alt="Book-3" class="object-cover w-full h-32 sm:h-36">
+            <p class="text-center text-xs text-gray-600 mt-2">Book-3</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden input for selected image -->
+      <input type="hidden" id="selected_image" name="selected_image"/>
+
+      <!-- Submit Button -->
+      <div class="flex justify-center">
+        <button type="button" onclick="submitForm()"
+          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300">
+          Submit
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    function selectThumbnail(element, imageValue) {
+      document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('selected'));
+      element.classList.add('selected');
+      document.getElementById('selected_image').value = imageValue;
+    }
+
+    function submitForm() {
+      const selectedImage = document.getElementById('selected_image').value;
+      const drId = document.getElementById('dr_id').value.trim();
+      const drName = document.getElementById('dr_name').value.trim();
+
+      if (!drId || !drName) {
+        alert('Please fill out all fields.');
+        return;
+      }
+
+      if (!selectedImage) {
+        alert('Please select a book image.');
+        return;
+      }
+
+      document.getElementById('uploadForm').submit();
+    }
+  </script>
+</body>
+</html>

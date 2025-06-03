@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block head_title %}CoralCal Doctor Engagement Plateform{% endblock head_title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% include 'base/css.html' %}
+  </head>
+  <body>
+    <div class="antialiased relative">
+      {% block content %} {% endblock content %}
+    </div>
+  </body>
+</html>
