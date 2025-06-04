@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'knowledge_series',
+    'dr_gift_catalogs',
 ]
 
 MIDDLEWARE = [
