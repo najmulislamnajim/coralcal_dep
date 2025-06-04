@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block head_title %}CoralCal | Doctor Engagement Platform{% endblock %}
+
+{% block header %}
+<!-- <header class="bg-white shadow w-full p-4 mb-6">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <img src="{% static 'core/images/CoralCal-Kit.png' %}" alt="Logo" class="h-10 sm:h-12">
+        <a href="{% url 'logout' %}" 
+        class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 inline-block">
+        Logout
+        </a>
+
+    </div>
+</header> -->
+
+<nav
+  class="sticky top-0 z-10 bg-background border-b border-muted w-full flex justify-between items-center gap-5 px-2"
+>
+    <!-- logo -->
+    <div class="logo gap-2">
+      <a href="" class="py-3">
+        <img
+          class="min-w-[85px]"
+          src="{% static 'core/images/d1.svg' %}"
+          alt="CoralCal D1 logo"
+          width="85"
+        />
+      </a>
+      <a href="" class="py-0">
+        <img
+          class="min-w-[85px] min-h-[42.5px]"
+          src="{% static 'core/images/dx.svg' %}"
+          alt="CoralCal DX logo"
+          width="85"
+        />
+      </a>
+      <a href="" class="py-0">
+        <img
+          class="min-w-[85px] min-h-[42.5px]"
+          src="{% static 'core/images/vita.svg' %}"
+          alt="CoralCal Vita logo"
+          width="85"
+        />
+      </a>
+    </div>
+
+
+    <!-- log out -->
+     <a href="{% url 'logout' %}" class="button button--sm button--primary">
+      <i data-lucide="log-out"></i>
+      <span>Logout</span>
+     </a>
+  </div>
+</nav>
+{% endblock header %}
+
+{% block content %}
+{% endblock %}
