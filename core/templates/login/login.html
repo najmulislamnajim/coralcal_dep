@@ -12,10 +12,18 @@
       <form method="post">
         {% csrf_token %}
         <div class="flex flex-col gap-6">
-          <div class="flex flex-col items-center gap-2">
-            <a href="{% url 'home' %}" class="flex flex-col items-center gap-2 font-medium">
-              <img width="180" height="45" src="{% static 'core/images/Coralcal-Kit.png' %}" alt="logo" />
-            </a>
+          <div class="flex flex-col items-center gap-2 ">
+            <div class="flex flex-wrap items-center justify-center gap-4 mb-6">
+              <a href="{% url 'home' %}" class="">
+                <img width="180" height="45" src="{% static 'core/images/d1.svg' %}" alt="logo" />
+              </a>
+              <a href="{% url 'home' %}" class="">
+                <img width="180" height="45" src="{% static 'core/images/dx.svg' %}" alt="logo" />
+              </a>
+              <a href="{% url 'home' %}" class="">
+                <img width="180" height="45" src="{% static 'core/images/vita.svg' %}" alt="logo" />
+              </a>
+            </div>
             <h1 class="text-xl font-bold">Doctor Engagement Plateform</h1>
           </div>
           <div class="flex flex-col gap-6">
