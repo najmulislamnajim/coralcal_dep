@@ -4,12 +4,15 @@
     <title>{% block head_title %}CoralCal Doctor Engagement Plateform{% endblock head_title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {% include 'base/css.html' %}
+    {% block extra_css %} {% endblock extra_css %}
   </head>
   <body>
+    {% block header %} {% endblock header %}
+    {%include '_partials/toast.html'%} {%include '_partials/modal.html'%}
     <div class="antialiased relative">
       {% block content %} {% endblock content %}
     </div>
-
     {% include 'base/js.html' %}
+    {% include '_partials/select.html' %}
   </body>
 </html>
