@@ -22,7 +22,7 @@ def book_choice(request):
 
         if not (dr_id and dr_name and book_title):
             messages.error(request, "All fields are required and a book must be selected.")
-            return redirect('upload')
+            return redirect('book_choice')
 
         try:
             territory_id = request.user.username
