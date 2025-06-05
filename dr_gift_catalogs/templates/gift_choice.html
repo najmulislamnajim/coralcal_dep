@@ -1,0 +1,159 @@
+{% extends 'base_header.html' %}
+{% load static %}
+{% block head_title %}Gift Choice Form | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+  .thumbnail {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .thumbnail.selected {
+    border: 2px solid #3b82f6;
+    transform: scale(1.05);
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6  items-center gap-5 text-center">
+        <h2 class="text-2xl font-bold text-primary text-center">
+            Gift Choice Form
+        </h2>
+    </div>
+    <div id="main-container" class="border border-border p-4 rounded-md">
+        <div class="form-container">
+            <div class="form-header">
+                <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-item">
+                        <label class="label" for="dr_id">Doctor ID</label>
+                        <input 
+                            type="text"
+                            id="dr_id"
+                            name="dr_id"
+                            maxlength="10"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor ID"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="dr_name">Doctor Name</label>
+                        <input 
+                            type="text"
+                            id="dr_name"
+                            name="dr_name"
+                            maxlength="100"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor Name"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="select_book">Select Book</label>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image1')">
+                                <img src="{% static 'images/pureit.webp' %}" alt="pureit" class="object-cover w-full h-60">
+                                <p class="text-center text-xs text-gray-600 mt-2">Pureit Classic 23 L</p>
+                            </div>
+                            <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image2')">
+                                <img src="{% static 'images/blender.webp' %}" alt="blender" class="object-cover w-full h-60">
+                                <p class="text-center text-xs text-gray-600 mt-2">Philips Blender 450W Daily Collection (HR2058/91)</p>
+                            </div>
+                            <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image3')">
+                                <img src="{% static 'images/watch.webp' %}" alt="watch" class="object-cover w-full h-60">
+                                <p class="text-center text-xs text-gray-600 mt-2">Smart Watch Fastrack Reflex Rave FX</p>
+                            </div>
+                            <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image4')">
+                                <img src="{% static 'images/cookware.jpg' %}" alt="cookware" class="object-cover w-full h-60">
+                                <p class="text-center text-xs text-gray-600 mt-2">Kiam Marble Coated 7 pc Set</p>
+                            </div>
+                            <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image5')">
+                                <img src="{% static 'images/conference.jpg' %}" alt="conference" class="object-cover w-full h-60">
+                                <p class="text-center text-xs text-gray-600 mt-2">International Scientific Conference Registration</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden input for selected image -->
+                    <input type="hidden" id="selected_image" name="selected_image"/>
+
+                    <div class="form-item" id="conference_upload_container">
+                        <label class="label" for="conference_image">OGSB Registration</label>
+                        <input
+                          class="input"
+                          type="file"
+                          id="conference_image"
+                          name="conference_image"
+                          accept="image/jpeg,image/png"
+                        />
+                    </div>
+
+                    <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectThumbnail(element, imageValue) {
+    document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('selected_image').value = imageValue;
+
+    const imageUploadField = document.getElementById('conference_image');
+    const container = document.getElementById('conference_upload_container');
+
+    if (imageValue === 'image5') {
+      imageUploadField.required = true;
+      container.style.display = 'block';
+    } else {
+      imageUploadField.required = false;
+      imageUploadField.value = '';
+      container.style.display = 'none';
+    }
+  }
+
+  function submitForm(event) {
+    event.preventDefault(); // prevent default form submit
+
+    const selectedImage = document.getElementById('selected_image').value;
+    const drId = document.getElementById('dr_id').value.trim();
+    const drName = document.getElementById('dr_name').value.trim();
+    const conferenceImage = document.getElementById('conference_image');
+
+    if (!drId || !drName) {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    if (!selectedImage) {
+      alert('Please select a book image.');
+      return;
+    }
+
+    if (selectedImage === 'image5' && !conferenceImage.files.length) {
+      alert('Please upload the OGSB Registration image.');
+      return;
+    }
+
+    document.getElementById('uploadForm').submit();
+  }
+
+  // Hide the conference image upload field by default
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('conference_upload_container').style.display = 'none';
+  });
+</script>
+{% endblock content %}
