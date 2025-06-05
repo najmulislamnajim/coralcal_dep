@@ -1,7 +1,32 @@
+import os
 from django.db import models
 from core.models import Territory
 
 # Create your models here.
+def get_image_upload_path(instance, filename):
+    """
+    Generate a structured upload path and filename for images.
+    
+    Args:
+        instance (ConferenceImage): The ConferenceImage instance.
+        filename (str): The name of the uploaded file.
+        
+    Returns:
+        str: The constructed upload path.
+    """
+    
+    # Extract file extension
+    ext = os.path.splitext(filename)[1]
+    
+    territory_obj = Territory.objects.get(territory=instance.territory.territory)
+    zone = territory_obj.zone_name
+    region = territory_obj.region_name
+    # Construct filename
+    filename = f"{instance.territory.territory}_{instance.dr_id}_{instance.dr_name}{ext}"
+    
+    # Construct path and return
+    return os.path.join('conference_images',zone, region, instance.territory.territory, filename)
+
 class DrGiftCatalog(models.Model):
     """
     Model to represent a doctor's gift catalog.
@@ -16,7 +41,7 @@ class DrGiftCatalog(models.Model):
         GIFT4 = 'Philips Blender 450W Daily Collection (HR2058/91)', 'Philips Blender 450W Daily Collection (HR2058/91)'
         GIFT5 = 'International Scientific Conference Registration', 'International Scientific Conference Registration'
     gift = models.CharField(max_length=255, choices=Gift.choices, default=Gift.GIFT1)
-    conference_image = models.ImageField(upload_to='conference_images/', blank=True, null=True)
+    conference_image = models.ImageField(upload_to=get_image_upload_path, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
