@@ -1,0 +1,19 @@
+{% extends "base_header.html" %}
+{% block head_title %}CoralCal Doctor Engagement Platefrom{% endblock %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6  items-center gap-5 text-center">
+        <h2 class="text-2xl font-bold text-primary text-center">
+            Welcome {{ request.user.username }}
+        </h2>
+    </div>
+
+    <a class="button button--sm button--primary" href="{% url 'book_choice' %}">Knowledge Series</a>
+    <a class="button button--sm button--primary" href="{% url 'gift_choice' %}">Gift Catalogs</a>
+  </div>
+</div>
+{% endblock content %}
