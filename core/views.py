@@ -14,7 +14,7 @@ def login_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
             return redirect('admin')
-        return redirect('book_choice')
+        return redirect('territory_home')
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -24,7 +24,7 @@ def login_view(request):
             login(request, user)
             if not user.is_superuser:
                 messages.success(request, "Login successful.")
-                return redirect('book_choice')
+                return redirect('territory_home')
             messages.success(request, "Login successful.")
             return redirect('admin')
         
@@ -42,3 +42,7 @@ def user_logout(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect('login')
+
+@login_required
+def territory_home(request):
+    return render(request, 'home.html')
