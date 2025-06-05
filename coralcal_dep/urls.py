@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('ks', include('knowledge_series.urls')),
+    path('gift/', include('dr_gift_catalogs.urls')),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
