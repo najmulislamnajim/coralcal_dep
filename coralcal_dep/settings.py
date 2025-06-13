@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'core',
     'knowledge_series',
     'dr_gift_catalogs',
+    'admin',
 ]
 
 MIDDLEWARE = [
