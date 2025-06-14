@@ -1,0 +1,55 @@
+{% load static %}
+
+<nav
+  class="sticky top-0 z-10 bg-background border-b border-muted w-full flex justify-between items-center gap-5 px-2"
+>
+  <div class="left flex items-center gap-2">
+    <button id="toggle-button" class="button button--icon" onclick="toggleSidebar()">
+      <i data-lucide="menu"></i>
+    </button>
+
+    <!-- logo -->
+    <div class="logo gap-2">
+      <a href="{% url 'home' %}" class="py-3">
+        <img
+          class="min-w-[85px]"
+          src="{% static 'core/images/d1.svg' %}"
+          alt="CoralCal D1 logo"
+          width="85"
+        />
+      </a>
+      <a href="{% url 'home' %}" class="py-0">
+        <img
+          class="min-w-[85px] min-h-[42.5px]"
+          src="{% static 'core/images/dx.svg' %}"
+          alt="Coralcal DX logo"
+          width="85"
+        />
+      </a>
+      <a href="{% url 'home' %}" class="py-0">
+        <img
+          class="min-w-[85px] min-h-[42.5px]"
+          src="{% static 'core/images/vita.svg' %}"
+          alt="Coralcal vita logo"
+          width="85"
+        />
+      </a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // toggle sidebar
+  const toggleSidebar = () => {
+    const sidebar = document.getElementById("sidebar");
+    const sheet = document.getElementById("sheet");
+    const dashboardMain = document.getElementById("dashboard-main");
+    const status = sidebar.getAttribute("data-open");
+    const sheetStatus = sheet.getAttribute("data-open");
+    const dashboardMainStatus = dashboardMain.getAttribute("data-open");
+
+    sidebar.setAttribute("data-open", status === "true" ? "false" : "true");
+    sheet.setAttribute("data-open", sheetStatus === "true" ? "false" : "true");
+    dashboardMain.setAttribute("data-open", dashboardMainStatus === "true" ? "false" : "true");
+  };
+</script>
