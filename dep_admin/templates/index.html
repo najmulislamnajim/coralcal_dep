@@ -1,0 +1,22 @@
+{% extends "base.html" %} {%block content%}
+
+
+{% include 'navbar.html' %}
+<div class="bg-background flex relative min-h-[90svh]">
+  <!-- sidebar -->
+  {%include 'sidebar.html' %}
+  <!-- dashboard conten -->
+  <div
+    data-open="true"
+    id="dashboard-main"
+    class="w-full md:data-[open=false]:w-[calc(100%-var(--sidebar-width-icon))] md:data-[open=true]:w-[calc(100%-var(--sidebar-width))]"
+  >
+    <!-- main content -->
+    <main class="bg-background p-4 w-full">
+      {%block dashboard %}
+      <p>Dashboard content</p>
+      {%endblock dashboard %}
+    </main>
+  </div>
+</div>
+{%endblock%}
