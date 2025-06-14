@@ -1,4 +1,5 @@
-from django.shortcuts import render 
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from knowledge_series.models import BookWishes
 from django.db.models import Q
@@ -6,6 +7,7 @@ from django.core.paginator import Paginator
 import openpyxl
 from io import BytesIO
 from django.http import HttpResponse
+from core.models import Territory
 
 # Create your views here.
 @login_required
@@ -93,3 +95,24 @@ def export_knowledge_series(request):
     response['Content-Disposition'] = 'attachment; filename="knowledge_series_data.xlsx"'
     
     return response
+
+@login_required
+def delete_knowledge_series_data(request, id):
+    territory = request.user.username
+    if request.user.is_superuser:
+        territory = request.GET.get('territory')
+    # territory_obj = Territory.objects.get(territory=territory)
+    # ks_obj = BookWishes.objects.filter(territory__territory=territory)
+    obj = BookWishes.objects.get(id=id)
+    try:
+        obj.delete()
+        
+        messages.success(request, f"Data deleted successfully.")
+        if request.user.is_superuser:
+            return redirect('knowledge_series')
+        return redirect('home')
+    except BookWishes.DoesNotExist:
+        messages.error(request, "Invalid Item selected.")
+        if request.user.is_superuser:
+            return redirect('knowledge_series')
+        return redirect('home')

@@ -182,20 +182,25 @@
                   </tr>
               </thead>
               <tbody class="table-body">
-                  {% for doctor in data %}
+                  {% for item in data %}
                   <tr class="table-row">
                       <td class="table-cell">{{ forloop.counter }}</td>
-                      <td class="table-cell">{{doctor.dr_id}}</td>
-                      <td class="table-cell">{{ doctor.dr_name }}</td>
-                      <td class="table-cell">{{doctor.territory.territory}}</td>
-                      <td class="table-cell">{{doctor.territory.territory_name}}</td>
-                      <td class="table-cell">{{doctor.territory.region_name}}</td>
-                      <td class="table-cell">{{doctor.territory.zone_name}}</td>
-                      <td class="table-cell">{{doctor.book}}</td>
+                      <td class="table-cell">{{item.dr_id}}</td>
+                      <td class="table-cell">{{item.dr_name }}</td>
+                      <td class="table-cell">{{item.territory.territory}}</td>
+                      <td class="table-cell">{{item.territory.territory_name}}</td>
+                      <td class="table-cell">{{item.territory.region_name}}</td>
+                      <td class="table-cell">{{item.territory.zone_name}}</td>
+                      <td class="table-cell">{{item.book}}</td>
                       <td class="table-cell">
                           <a class="button button--icon button--outline" href=""><i data-lucide="edit" class="text-primary"></i></a>
                           
-                          <a class="button button--icon button--outline" href=""><i data-lucide="trash" class="text-destructive"></i></a> 
+                          <a class="button button--icon button--outline" href="{% url 'delete_knowledge_series' item.id %}"><i data-lucide="trash" class="text-destructive"></i></a>
+                          <!-- <a class="button button--icon button--outline" 
+                            href="{% url 'delete_knowledge_series' item.id %}"
+                            onclick="return confirm('Are you sure you want to delete this item?');">
+                              <i data-lucide="trash" class="text-destructive"></i>
+                          </a> -->
                       </td>
                   </tr>
                   {% endfor %}
