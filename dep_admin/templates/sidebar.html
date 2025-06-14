@@ -1,0 +1,107 @@
+{%load static%}
+
+<!-- large screen -->
+<aside
+  id="sidebar"
+  class="sticky top-12 hidden md:block h-full group border-r border-muted data-[open=false]:w-(--sidebar-width-icon) data-[open=true]:w-(--sidebar-width) transition-all duration-300 overflow-hidden [&_svg]:min-size-3.5"
+  data-open="true"
+>
+  <div
+    id="sidebar-container"
+    class="flex flex-col justify-between gap-3 min-h-[calc(100svh-44px)]"
+  >
+    <!-- top -->
+    <section
+      class="flex flex-col gap-5 group-data-[open=false]:items-center mt-2"
+    >
+      <!-- nav list -->
+      <nav class="flex flex-col gap-1 px-4">
+        <a class="navlist" href="/dep/admin/book"
+          ><i data-lucide="book-open"></i>
+          <span class="toggle">Book Wishlist</span></a
+        >
+        <a class="navlist" href="/dashboard/user"
+          ><i data-lucide="gift"></i>
+          <span class="toggle">Gift Catalogs</span></a
+        >
+      </nav>
+    </section>
+
+    <!-- bottom -->
+    <div
+      class="flex flex-col gap-5 group-data-[open=false]:items-center px-4 mb-2"
+    >
+      <a class="navlist" href="{% url 'logout' %}"
+        ><i data-lucide="log-out"></i> <span class="toggle">Logout</span></a
+      >
+    </div>
+  </div>
+</aside>
+
+<!-- mobile screen -->
+<div
+  id="sheet"
+  data-open="false"
+  class="sheet group data-[open=false]:max-w-0 data-[open=true]:md:hidden md:hidden data-[open=true]:block fixed z-20 max-w-full w-full min-h-svh top-0 left-0 overflow-hidden"
+>
+  <div class="wrapper relative w-full min-h-svh flex">
+    <div class="w-3/4 max-w-md bg-background min-h-svh">
+      <div
+        id="sheet-content"
+        class="relative z-10 bg-background group-data-[open=false]:-translate-x-[20rem] translate-x-0 transition-all duration-300"
+      >
+        <!-- logo -->
+        <div class="logo px-4">
+          <a href="" class="py-0">
+            <img
+              class="min-w-[85px]"
+              src="{% static '/images/bonova.jpg' %}"
+              alt="Benova logo"
+              width="85"
+            />
+          </a>
+        </div>
+
+        <!-- close button -->
+        <button
+          class="absolute top-2 right-5 button button--icon button--secondary"
+          onclick="closeSheet()"
+        >
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- backdrop -->
+    <div
+      class="absolute top-0 right-0 bg-muted-foreground/50 w-full h-full group-data-[open=false]:opacity-0 opacity-100 transition-opacity duration-300"
+      onclick="closeSheet()"
+    ></div>
+  </div>
+</div>
+
+<script>
+  // active nav list
+  const currentPath = window.location.pathname;
+  const navlinks = document.querySelectorAll(".navlist");
+
+  navlinks.forEach((item) => {
+    console.log(item.getAttribute("href"));
+    if (item.getAttribute("href") === currentPath) {
+      item.classList.add("active");
+    }
+  });
+
+  // copy navlist to mobile sheet
+  const sidebarContainer = document.getElementById("sidebar-container");
+
+  const copyOfContainer = sidebarContainer.cloneNode(true);
+
+  document.getElementById("sheet-content").appendChild(copyOfContainer);
+
+  const closeSheet = () => {
+    const sheet = document.getElementById("sheet");
+
+    sheet.setAttribute("data-open", false);
+  };
+</script>
