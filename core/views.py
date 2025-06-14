@@ -13,7 +13,7 @@ def login_view(request):
     """
     if request.user.is_authenticated:
         if request.user.is_superuser:
-            return redirect('book')
+            return redirect('knowledge_series')
         return redirect('territory_home')
     
     if request.method == 'POST':
@@ -26,7 +26,7 @@ def login_view(request):
                 messages.success(request, "Login successful.")
                 return redirect('territory_home')
             messages.success(request, "Login successful.")
-            return redirect('book')
+            return redirect('knowledge_series')
         
         else:
             messages.error(request, "Invalid username or password.")
