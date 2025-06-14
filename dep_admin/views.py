@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from knowledge_series.models import BookWishes
 from django.db.models import Q
 from django.core.paginator import Paginator
+import openpyxl
+from io import BytesIO
+from django.http import HttpResponse
 
 # Create your views here.
 @login_required
@@ -50,4 +53,43 @@ def knowledge_series(request):
     return render(request, 'knowledge_series.html', {
         'data': page_obj, 'search_query': search_query, 'per_page': per_page, 'sort': sort, 'direction': direction
     })
+    
+@login_required 
+def export_knowledge_series(request):
+    """
+    Export the knowledge series data to an Excel file.
+    """
 
+    # Create a new workbook and add a worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Knowledge Series Data"
+    
+    # Define the header row
+    headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Book']
+    worksheet.append(headers)
+    
+    # Populate the worksheet with data
+    queryset = BookWishes.objects.select_related('territory')
+    for obj in queryset:
+        row = [
+            obj.dr_id,
+            obj.dr_name,
+            obj.territory.territory,
+            obj.territory.territory_name,
+            obj.territory.region_name,
+            obj.territory.zone_name,
+            obj.book
+        ]
+        worksheet.append(row)
+    
+    # Save the workbook to a BytesIO object
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Create a response with the Excel file
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="knowledge_series_data.xlsx"'
+    
+    return response
