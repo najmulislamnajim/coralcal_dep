@@ -8,5 +8,5 @@ urlpatterns = [
     path('', include('core.urls')),
     path('ks', include('knowledge_series.urls')),
     path('gift/', include('dr_gift_catalogs.urls')),
-    path('admin/', include('dep_admin.urls')),
+    path('dep/admin/', include('dep_admin.urls')),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
