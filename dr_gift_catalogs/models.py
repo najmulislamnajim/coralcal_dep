@@ -21,11 +21,12 @@ def get_image_upload_path(instance, filename):
     territory_obj = Territory.objects.get(territory=instance.territory.territory)
     zone = territory_obj.zone_name
     region = territory_obj.region_name
+    dr_forlder = f"{instance.dr_id}-{instance.dr_name.replace(' ', '_')}" if instance.dr_name else instance.dr_id
     # Construct filename
     filename = f"{instance.territory.territory}_{instance.dr_id}_{instance.dr_name}{ext}"
     
     # Construct path and return
-    return os.path.join('conference_images',zone, region, instance.territory.territory, filename)
+    return os.path.join('conference_images',zone, region, instance.territory.territory,instance.dr_name, filename)
 
 class DrGiftCatalog(models.Model):
     """
