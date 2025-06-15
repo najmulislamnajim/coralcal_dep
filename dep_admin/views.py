@@ -208,4 +208,7 @@ def export_gift_catalogs(request):
     response['Content-Disposition'] = 'attachment; filename="gift_catalogs_data.xlsx"'
     
     return response
-           
+
+@login_required
+def gift_catalogs(request):
+    return render(request, 'gift_catalogs.html')           
