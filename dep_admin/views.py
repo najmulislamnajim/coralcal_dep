@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import login_required
 from knowledge_series.models import BookWishes
 from django.db.models import Q
 from django.core.paginator import Paginator
-import openpyxl
+import openpyxl , os, zipfile, shutil
 from io import BytesIO
 from django.http import HttpResponse
 from core.models import Territory
+from django.conf import settings
 
 # Create your views here.
 @login_required
@@ -116,3 +117,24 @@ def delete_knowledge_series_data(request, id):
         if request.user.is_superuser:
             return redirect('knowledge_series')
         return redirect('home')
+    
+@login_required 
+def download_gift_catalogs(request):
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'conference_images')
+    
+    if not os.path.exists(folder_path):
+        messages.error(request, "No images found in this directory.")
+        return redirect('gift_catalogs')
+    
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for root, _ , files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
+                zip_file.write(file_path, relative_path)
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="conference_images.zip"'
+    return response
+           
