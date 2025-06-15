@@ -7,4 +7,5 @@ urlpatterns = [
     path('export_knowledge_series/', views.export_knowledge_series, name='export_knowledge_series'),
     path('delete_knowledge_series/<int:id>/', views.delete_knowledge_series_data, name='delete_knowledge_series'),
     path('download_gift_catalogs', views.download_gift_catalogs, name='download_gift_catalogs'),
+    path('export_gift_catalogs', views.export_gift_catalogs, name='export_gift_catalogs'),
 ]

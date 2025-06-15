@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from knowledge_series.models import BookWishes
+from dr_gift_catalogs.models import DrGiftCatalog
 from django.db.models import Q
 from django.core.paginator import Paginator
 import openpyxl , os, zipfile, shutil
@@ -136,5 +137,45 @@ def download_gift_catalogs(request):
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/zip')
     response['Content-Disposition'] = 'attachment; filename="conference_images.zip"'
+    return response
+
+@login_required 
+def export_gift_catalogs(request):
+    """
+    Export the Gift Catalogs data to an Excel file.
+    """
+
+    # Create a new workbook and add a worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Gift Catalogs Data"
+    
+    # Define the header row
+    headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Gift Choice']
+    worksheet.append(headers)
+    
+    # Populate the worksheet with data
+    queryset = DrGiftCatalog.objects.select_related('territory')
+    for obj in queryset:
+        row = [
+            obj.dr_id,
+            obj.dr_name,
+            obj.territory.territory,
+            obj.territory.territory_name,
+            obj.territory.region_name,
+            obj.territory.zone_name,
+            obj.gift
+        ]
+        worksheet.append(row)
+    
+    # Save the workbook to a BytesIO object
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Create a response with the Excel file
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="gift_catalogs_data.xlsx"'
+    
     return response
            
