@@ -21,12 +21,12 @@
   <div class="card">
     <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6 flex justify-between gap-5 text-center">
         <h2 class="text-2xl font-bold text-primary text-center">
-            You have already updated {{data.count}} doctor data.
+            You have uploaded {{data.count}} doctor data.
         </h2>
         {% if data.count == 2 %}
         <a href="{% url 'home' %}" class="button button--sm button--primary">Back</a>
         {% else %}
-        <a href="{% url 'git_choice' %}" class="button button--sm button--primary">Back</a>
+        <a href="{% url 'gift_choice' %}" class="button button--sm button--primary">Back</a>
         {% endif %}
     </div>
 
@@ -38,7 +38,7 @@
         <div class="flex gap-4 justify-between items-center mb-4">
             <a id="book-item-{{obj.id}}" href="javascript:void(0);" onclick="toggleBookContent({{obj.id}})" class="button button--sm button--primary"><i id="book-icon-{{obj.id}}" data-lucide="eye-off"></i>Hide</a>
             <a href="" class="button button--sm button--primary">Edit</a>
-            <a href=""" class="button button--sm button--primary">Delete</a>
+            <a href="{% url 'delete_gift_catalog' obj.id %}" class="button button--sm button--primary">Delete</a>
         </div>
 
         <div id="book-content-obj{{obj.id}}" class="w-full m-auto">

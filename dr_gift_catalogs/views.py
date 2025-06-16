@@ -87,3 +87,17 @@ def view_gift_catalogs(request):
             print('No item found')
             
     return render(request, 'view_choice.html', {'data':obj})
+
+
+@login_required
+def delete_gift_catalog(request, id):
+    """
+    Delete a gift catalog entry.
+    """
+    try:
+        obj = DrGiftCatalog.objects.get(id=id)
+        obj.delete()
+        messages.success(request, "Gift catalog entry deleted successfully.")
+    except DrGiftCatalog.DoesNotExist:
+        messages.error(request, "Gift catalog entry not found.")
+    return redirect('gift_choice')
