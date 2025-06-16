@@ -37,7 +37,7 @@
         </div>
         <div class="flex gap-4 justify-between items-center mb-4">
             <a id="book-item-{{obj.id}}" href="javascript:void(0);" onclick="toggleBookContent({{obj.id}})" class="button button--sm button--primary"><i id="book-icon-{{obj.id}}" data-lucide="eye-off"></i>Hide</a>
-            <a href="" class="button button--sm button--primary">Edit</a>
+            <a href="{% url 'edit_gift_catalog' obj.id %}" class="button button--sm button--primary">Edit</a>
             <a href="{% url 'delete_gift_catalog' obj.id %}" class="button button--sm button--primary">Delete</a>
         </div>
 
