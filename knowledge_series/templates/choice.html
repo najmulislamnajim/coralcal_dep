@@ -33,7 +33,7 @@
     <div id="main-container" class="border border-border p-4 rounded-md">
         <div class="flex gap-4 justify-between items-center mb-4">
             <a id="book-item" href="javascript:void(0);" onclick="toggleBookContent()" class="button button--sm button--primary"><i id="book-icon" data-lucide="eye-off"></i>Hide</a>
-            <a href="{% url 'home' %}" class="button button--sm button--primary">Edit</a>
+            <a href="{% url 'edit_ks' obj.id %}" class="button button--sm button--primary">Edit</a>
             <a href="{% url 'delete_knowledge_series' obj.id %}"" class="button button--sm button--primary">Delete</a>
         </div>
 

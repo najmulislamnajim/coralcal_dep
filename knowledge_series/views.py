@@ -4,6 +4,7 @@ from .models import BookWishes, Territory
 import csv
 from django.http import HttpResponse
 from django.templatetags.static import static
+from django.contrib.auth.decorators import login_required
 
 # map book names
 IMAGE_TO_BOOK = {
@@ -64,6 +65,47 @@ def book_choice(request):
                 print("No image found for the book title:", book_title)
             return render(request, 'choice.html', {'obj': obj, 'img':img})
         return render(request, 'book_choice.html')
+    
+@login_required
+def edit_choice(request, id):
+    if request.method == 'POST':
+        dr_id = request.POST.get('dr_id')
+        dr_name = request.POST.get('dr_name')
+        selected_image = request.POST.get('selected_image')
+        book_title = IMAGE_TO_BOOK.get(selected_image)
+
+        if not (dr_id and dr_name and book_title):
+            messages.error(request, "All fields are required and a book must be selected.")
+            return redirect('edit_choice', id=id)
+
+        try:
+            obj = BookWishes.objects.get(id=id)
+            obj.dr_id = dr_id
+            obj.dr_name = dr_name
+            obj.book = book_title
+            obj.save()
+            messages.success(request, f"Successfully updated book wish for {dr_name}.")
+            return redirect('book_choice')
+        except Exception as e:
+            messages.error(request, f"Error occurred: {str(e)}")
+            return redirect('edit_choice', id=id)
+
+    elif request.method == 'GET':
+        try:
+            obj = BookWishes.objects.get(id=id)
+            book_title = obj.book
+            if book_title == '100 diagnostic dilemmas in clinical medicine':
+                img = static('images/book1.jpg')
+            elif book_title == '100 cases in obstetrics and gynaecology':
+                img = static('images/book2.jpg')
+            elif book_title == '100 cases in accute medicine':
+                img = static('images/book3.jpg')
+            else:
+                img = ''
+            return render(request, 'edit_choice.html', {'obj': obj, 'img': img})
+        except BookWishes.DoesNotExist:
+            messages.error(request, "Wish not found.")
+            return redirect('book_choice')
 
 
 def export_wishlist(request):

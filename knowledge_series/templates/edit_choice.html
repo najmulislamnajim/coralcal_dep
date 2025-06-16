@@ -1,0 +1,115 @@
+{% extends "base_header.html" %}
+{% load static %}
+{% block head_title %}Edit Wishes Form | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+  .thumbnail {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .thumbnail.selected {
+    border: 4px solid #3b82f6;
+    transform: scale(1.05);
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto">
+  <div class="card">
+    <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6 flex justify-between gap-5 text-center">
+      <h2 class="text-2xl font-bold text-primary text-center">Edit Doctor Wishes</h2>
+      <a href="{% url 'book_choice' %}" class="button button--sm button--primary">Back</a>
+    </div>
+
+    <div id="main-container" class="border border-border p-4 rounded-md">
+      <div class="form-container">
+        <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="form-item">
+            <label class="label" for="dr_id">Doctor RPL ID</label>
+            <input 
+              type="text"
+              id="dr_id"
+              name="dr_id"
+              maxlength="10"
+              class="input"
+              required
+              placeholder="Enter Doctor RPL ID"
+              value="{{ obj.dr_id }}"
+            />
+          </div>
+
+          <div class="form-item">
+            <label class="label" for="dr_name">Doctor Name</label>
+            <input 
+              type="text"
+              id="dr_name"
+              name="dr_name"
+              maxlength="100"
+              class="input"
+              required
+              placeholder="Enter Doctor Name"
+              value="{{ obj.dr_name }}"
+            />
+          </div>
+
+          <div class="form-item">
+            <label class="label" for="select_book">Select Book</label>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image1')">
+                <img src="{% static 'images/book1.jpg' %}" alt="Book-1" class="object-cover w-full h-60">
+                <p class="text-center text-xs text-gray-600 mt-2">Clinical Medicine</p>
+              </div>
+              <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image2')">
+                <img src="{% static 'images/book2.jpg' %}" alt="Book-2" class="object-cover w-full h-60">
+                <p class="text-center text-xs text-gray-600 mt-2">Obstetrics & Gynaecology</p>
+              </div>
+              <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" onclick="selectThumbnail(this, 'image3')">
+                <img src="{% static 'images/book3.jpg' %}" alt="Book-3" class="object-cover w-full h-60">
+                <p class="text-center text-xs text-gray-600 mt-2">Acute Medicine</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden input to store selected image -->
+          <input type="hidden" id="selected_image" name="selected_image"/>
+
+          <button type="submit" class="button button--md button--primary">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectThumbnail(element, imageValue) {
+    document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('selected'));
+    element.classList.add('selected');
+    document.getElementById('selected_image').value = imageValue;
+  }
+
+  // Auto-select current book on load
+  document.addEventListener('DOMContentLoaded', function () {
+    const bookToImage = {
+      "100 diagnostic dilemmas in clinical medicine": "image1",
+      "100 cases in obstetrics and gynaecology": "image2",
+      "100 cases in accute medicine": "image3"
+    };
+
+    const currentBook = "{{ obj.book|escapejs }}";
+    const selectedImage = bookToImage[currentBook];
+
+    if (selectedImage) {
+      const thumb = document.querySelector(`[onclick*="${selectedImage}"]`);
+      if (thumb) {
+        selectThumbnail(thumb, selectedImage);
+      }
+    }
+  });
+</script>
+{% endblock content %}
