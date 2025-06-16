@@ -4,6 +4,7 @@ from .models import DrGiftCatalog, Territory
 import csv 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.templatetags.static import static
 
 # map gift names
 IMAGE_TO_GIFT = {
@@ -55,7 +56,34 @@ def gift_choice(request):
         except DrGiftCatalog.DoesNotExist:
             obj = None
         count = obj.count() if obj else 0
+        if count >=2 :
+            return redirect('gift_choiced')
         return render(request, 'gift_choice.html', {
             'obj': obj,
             'count': count
         })
+        
+@login_required 
+def view_gift_catalogs(request):
+    territory_id = request.user.username
+    try:
+        obj = DrGiftCatalog.objects.filter(territory__territory=territory_id)
+    except DrGiftCatalog.DoesNotExist:
+        obj = None
+        return redirect('gift_choice')   
+    for item in obj:
+        gift = item.gift
+        if gift == 'Pureit Classic 23 L':
+            item.img = static('images/pureit.webp')
+        elif gift == 'Philips Blender 450W Daily Collection (HR2058/91)':
+            item.img = static('images/blender.webp')
+        elif gift == 'Smart Watch Fastrack Reflex Rave FX':
+            item.img = static('images/watch.webp') 
+        elif gift == 'Kiam Marble Coated 7 pc Set':
+            item.img = static('images/cookware.jpg') 
+        elif gift == 'International Scientific Conference Registration':
+            item.img = static('images/conference.png')
+        else:
+            print('No item found')
+            
+    return render(request, 'view_choice.html', {'data':obj})

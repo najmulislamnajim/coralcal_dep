@@ -1,0 +1,96 @@
+{% extends "base_header.html" %}
+{% load static %}
+{% block head_title %}Gift Choice | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+  .thumbnail {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .thumbnail.selected {
+    border: 2px solid #3b82f6;
+    transform: scale(1.05);
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6 flex justify-between gap-5 text-center">
+        <h2 class="text-2xl font-bold text-primary text-center">
+            You have already updated {{data.count}} doctor data.
+        </h2>
+        {% if data.count == 2 %}
+        <a href="{% url 'home' %}" class="button button--sm button--primary">Back</a>
+        {% else %}
+        <a href="{% url 'git_choice' %}" class="button button--sm button--primary">Back</a>
+        {% endif %}
+    </div>
+
+    {% for obj in data %}
+    <div id="main-container-{{obj.id}}" class="border border-border p-4 rounded-md mb-4">
+        <div class="mb-2">
+            <h2 class="text-2xl font-bold">Doctor-{{forloop.counter}}</h2>
+        </div>
+        <div class="flex gap-4 justify-between items-center mb-4">
+            <a id="book-item-{{obj.id}}" href="javascript:void(0);" onclick="toggleBookContent({{obj.id}})" class="button button--sm button--primary"><i id="book-icon-{{obj.id}}" data-lucide="eye-off"></i>Hide</a>
+            <a href="" class="button button--sm button--primary">Edit</a>
+            <a href=""" class="button button--sm button--primary">Delete</a>
+        </div>
+
+        <div id="book-content-obj{{obj.id}}" class="w-full m-auto">
+            <!-- Header -->
+            <div class="py-4">
+                <h2 class="text-xl">Dr. RPL ID: {{obj.dr_id}}</h2>
+                <h2 class="text-xl">Dr. Name: {{obj.dr_name}}</h2>
+                <p>Selected Gift Item: {{obj.gift}}</p>
+            </div>
+            
+            {% if obj.img %}
+            <img 
+                class="w-80 px-4 m-auto rounded-md shadow-md" 
+                src="{{ obj.img }}" 
+                alt="Book image"
+            >
+            {% endif %}
+
+            {% if obj.conference_image %}
+            <p class="my-2">Selected Conference Image:</p>
+            <img 
+                class="w-80 px-4 m-auto rounded-md shadow-md mt-4" 
+                src="{{ obj.conference_image.url }}" 
+                alt="Conference image"
+            >
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+  <script>
+  function toggleBookContent(id) {
+    const content = document.getElementById('book-content-obj' + id);
+    const button = document.getElementById('book-item-' + id);
+    const icon = document.getElementById('book-icon-' + id);
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.setAttribute('data-lucide', 'eye-off');
+        button.innerHTML = '<i id="book-icon-' + id + '" data-lucide="eye-off"></i> Hide';
+    } else {
+        content.classList.add('hidden');
+        icon.setAttribute('data-lucide', 'eye');
+        button.innerHTML = '<i id="book-icon-' + id + '" data-lucide="eye"></i> Show';
+    }
+
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+  }
+</script>
+
+{% endblock content %}
