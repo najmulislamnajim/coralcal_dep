@@ -48,4 +48,14 @@ def gift_choice(request):
         except Exception as e:
             messages.error(request, f"Error occurred: {str(e)}")
             return redirect('gift_choice')
-    return render(request, 'gift_choice.html')
+    elif request.method == 'GET':
+        territory_id = request.user.username
+        try:
+            obj = DrGiftCatalog.objects.filter(territory__territory=territory_id)
+        except DrGiftCatalog.DoesNotExist:
+            obj = None
+        count = obj.count() if obj else 0
+        return render(request, 'gift_choice.html', {
+            'obj': obj,
+            'count': count
+        })
