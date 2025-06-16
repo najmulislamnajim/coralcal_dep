@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import BookWishes, Territory 
 import csv
 from django.http import HttpResponse
+from django.templatetags.static import static
 
 # map book names
 IMAGE_TO_BOOK = {
@@ -45,8 +46,24 @@ def book_choice(request):
         except Exception as e:
             messages.error(request, f"Error occurred: {str(e)}")
             return redirect('book_choice')
-
-    return render(request, 'book_choice.html')
+    if request.method=='GET':
+        territory_id = request.user.username
+        try:
+            obj = BookWishes.objects.get(territory__territory=territory_id)
+        except BookWishes.DoesNotExist:
+            obj = None
+        if obj:
+            book_title = obj.book
+            if book_title == '100 diagnostic dilemmas in clinical medicine':
+                img = static('images/book1.jpg')
+            elif book_title == '100 cases in obstetrics and gynaecology':
+                img = static('images/book2.jpg')
+            elif book_title == '100 cases in accute medicine':
+                img = static('images/book3.jpg')
+            else:
+                print("No image found for the book title:", book_title)
+            return render(request, 'choice.html', {'obj': obj, 'img':img})
+        return render(request, 'book_choice.html')
 
 
 def export_wishlist(request):

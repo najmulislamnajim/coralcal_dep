@@ -1,0 +1,81 @@
+{% extends "base_header.html" %}
+{% load static %}
+{% block head_title %}Book Choice | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+  .thumbnail {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .thumbnail.selected {
+    border: 2px solid #3b82f6;
+    transform: scale(1.05);
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6 flex justify-between gap-5 text-center">
+        <h2 class="text-2xl font-bold text-primary text-center">
+            You have already updated your book choice.
+        </h2>
+        <a href="{% url 'home' %}" class="button button--sm button--primary">Back</a>
+    </div>
+    <!-- <div class="[&_h2]:font-semibold [&_h2]:text-primary [&_h2]:text-lg mb-6 flex justify-between gap-5 text-center">
+        <a href="{% url 'home' %}" class="button button--sm button--primary">View</a>
+        <a href="{% url 'home' %}" class="button button--sm button--primary">Edit</a>
+        <a href="{% url 'home' %}" class="button button--sm button--primary">Delete</a>
+    </div> -->
+    <div id="main-container" class="border border-border p-4 rounded-md">
+        <div class="flex gap-4 justify-between items-center mb-4">
+            <a id="book-item" href="javascript:void(0);" onclick="toggleBookContent()" class="button button--sm button--primary"><i id="book-icon" data-lucide="eye-off"></i>Hide</a>
+            <a href="{% url 'home' %}" class="button button--sm button--primary">Edit</a>
+            <a href="{% url 'delete_knowledge_series' obj.id %}"" class="button button--sm button--primary">Delete</a>
+        </div>
+
+        <div id="book-content" class="w-full m-auto">
+            <!-- Header -->
+            <div class="py-4">
+                <h2 class="text-xl">Dr. RPL ID: {{obj.dr_id}}</h2>
+                <h2 class="text-xl">Dr. Name: {{obj.dr_name}}</h2>
+                <p>Selected Book: {{obj.book}}</p>
+            </div>
+            
+            <!-- Image -->
+            <img 
+                class="w-80 px-4 m-auto rounded-md shadow-md" 
+                src="{{ img }}" 
+                alt="Book image"
+            >
+        </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function toggleBookContent() {
+    const content = document.getElementById('book-content');
+    const button = document.getElementById('book-item');
+    const icon = document.getElementById('book-icon');
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.setAttribute('data-lucide', 'eye-off');
+        button.innerHTML = '<i id="book-icon" data-lucide="eye-off"></i> Hide';
+    } else {
+        content.classList.add('hidden');
+        icon.setAttribute('data-lucide', 'eye');
+        button.innerHTML = '<i id="book-icon" data-lucide="eye"></i> Show';
+    }
+
+    // Re-render Lucide icons if you're using Lucide
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+}
+  </script>
+{% endblock content %}
