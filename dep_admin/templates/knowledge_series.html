@@ -193,7 +193,7 @@
                       <td class="table-cell">{{item.territory.zone_name}}</td>
                       <td class="table-cell">{{item.book}}</td>
                       <td class="table-cell">
-                          <a class="button button--icon button--outline" href=""><i data-lucide="edit" class="text-primary"></i></a>
+                          <a class="button button--icon button--outline" href="{% url 'edit_ks' item.id %}"><i data-lucide="edit" class="text-primary"></i></a>
                           
                           <a class="button button--icon button--outline" href="{% url 'delete_knowledge_series' item.id %}"><i data-lucide="trash" class="text-destructive"></i></a>
                           <!-- <a class="button button--icon button--outline" 
