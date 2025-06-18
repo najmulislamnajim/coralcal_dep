@@ -120,7 +120,8 @@ def delete_gift_catalog(request, id):
         messages.error(request, "Gift catalog entry not found.")
     except Exception as e:
         messages.error(request, f"Error while deleting: {str(e)}")
-
+    if request.user.is_superuser:
+        return redirect('gift_catalogs')
     return redirect('gift_choice')
 
 @login_required
@@ -170,6 +171,8 @@ def edit_gift_catalog(request, id):
 
             obj.save()
             messages.success(request, "Gift catalog entry updated successfully.")
+            if request.user.is_superuser:
+                return redirect('gift_catalogs')
             return redirect('gift_choiced')
         
         return render(request, 'edit_gift_choice.html', {
@@ -178,4 +181,6 @@ def edit_gift_catalog(request, id):
 
     except DrGiftCatalog.DoesNotExist:
         messages.error(request, "Gift catalog entry not found.")
+        if request.user.is_superuser:
+            return redirect('gift_catalogs')
         return redirect('gift_choice')

@@ -23,7 +23,11 @@
         <h2 class="text-2xl font-bold text-primary text-center">
           Edit  Gift Choice
         </h2>
+        {% if request.user.is_superuser %}
+        <a href="{% url 'gift_catalogs' %}" class="button button--sm button--primary">Back</a>
+        {% else %}
         <a href="{% url 'gift_choiced' %}" class="button button--sm button--primary">Back</a>
+        {% endif %}
     </div>
 
     <div id="main-container" class="border border-border p-4 rounded-md">
