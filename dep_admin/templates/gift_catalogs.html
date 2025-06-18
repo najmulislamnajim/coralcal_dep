@@ -78,7 +78,7 @@
                 
                 <li>
                   <label class="dropdown-item"
-                    ><input type="checkbox" checked data-column="7" /> Book Name</label
+                    ><input type="checkbox" checked data-column="7" /> Selected Gift</label
                   >
                 </li>
                 <li>
@@ -112,7 +112,7 @@
         </div>
 
         <!-- table -->
-          <!-- <div class="table-container">
+          <div class="table-container">
             <table class="table" id="doctorTable">
               <thead class="table-head">
                   <tr class="table-row">
@@ -177,7 +177,7 @@
                           {% endif %}
                           </a>
                       </th>
-                      <th class="table-head">Book Name</th>
+                      <th class="table-head">Selected Gift</th>
                       <th class="table-head">Actions</th>
                   </tr>
               </thead>
@@ -191,17 +191,17 @@
                       <td class="table-cell">{{item.territory.territory_name}}</td>
                       <td class="table-cell">{{item.territory.region_name}}</td>
                       <td class="table-cell">{{item.territory.zone_name}}</td>
-                      <td class="table-cell">{{item.book}}</td>
+                      <td class="table-cell">{{item.gift}}</td>
                       <td class="table-cell">
-                          <a class="button button--icon button--outline" href=""><i data-lucide="edit" class="text-primary"></i></a>
+                          <a class="button button--icon button--outline" href="{% url 'edit_gift_catalog' item.id %}"><i data-lucide="edit" class="text-primary"></i></a>
                           
-                          <a class="button button--icon button--outline" href="{% url 'delete_knowledge_series' item.id %}"><i data-lucide="trash" class="text-destructive"></i></a>
+                          <a class="button button--icon button--outline" href="{% url 'delete_gift_catalog' item.id %}"><i data-lucide="trash" class="text-destructive"></i></a>
                       </td>
                   </tr>
                   {% endfor %}
               </tbody>
               </table>
-          </div> -->
+          </div>
 
         <!-- pagination -->
         <div class="flex items-center justify-between flex-wrap gap-8 my-3 mt-6">
