@@ -85,6 +85,8 @@ def edit_choice(request, id):
             obj.book = book_title
             obj.save()
             messages.success(request, f"Successfully updated book wish for {dr_name}.")
+            if request.user.is_superuser:
+                return redirect('knowledge_series')
             return redirect('book_choice')
         except Exception as e:
             messages.error(request, f"Error occurred: {str(e)}")
@@ -105,6 +107,8 @@ def edit_choice(request, id):
             return render(request, 'edit_choice.html', {'obj': obj, 'img': img})
         except BookWishes.DoesNotExist:
             messages.error(request, "Wish not found.")
+            if request.user.is_superuser:
+                return redirect('knowledge_series')
             return redirect('book_choice')
 
 
