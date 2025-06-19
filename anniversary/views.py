@@ -5,6 +5,8 @@ from anniversary.models import Anniversary
 from core.models import Territory
 import os, shutil
 from django.conf import settings
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 # Create your views here.
 @login_required
@@ -89,3 +91,35 @@ def delete_anniversary(request, anniversary_id):
     except Anniversary.DoesNotExist:
         messages.error(request, "Anniversary data not found.")
     return redirect('anniversary_form')
+
+@login_required
+def anniversary_history(request):
+    if request.method == 'GET':
+        search_query = request.GET.get('search', '')
+        page_number = int(request.GET.get('page') or 1)
+        per_page = int(request.GET.get("per_page") or 10)
+        sort = request.GET.get("sort", "territory")
+        direction = request.GET.get("direction", "asc")
+        territory_id = request.user.username
+        try:
+            anniversary_data = Anniversary.objects.filter(territory__territory=territory_id)
+        except Anniversary.DoesNotExist:
+            anniversary_data = None
+            messages.error(request, "Anniversary data not found.")
+        
+        if search_query:
+            anniversary_data = anniversary_data.filter(
+                Q(dr_id__icontains=search_query) |
+                Q(dr_name__icontains=search_query)
+            )
+        sort_by = sort
+        if sort_by == "dr_id":
+            sort_by = "dr_id"
+        elif sort_by == "dr_name":
+            sort_by = "dr_name"
+        if direction == "desc":
+            sort_by = f"-{sort_by}"
+        anniversary_data = anniversary_data.order_by(sort_by)
+        paginator = Paginator(anniversary_data, per_page)
+        anniversary_data = paginator.get_page(page_number)
+        return render(request, 'anniversary_history.html', {'data': anniversary_data, 'search_query': search_query, 'per_page': per_page, 'sort': sort, 'direction': direction})
