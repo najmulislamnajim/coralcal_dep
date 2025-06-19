@@ -101,6 +101,8 @@ def anniversary_history(request):
         sort = request.GET.get("sort", "territory")
         direction = request.GET.get("direction", "asc")
         territory_id = request.user.username
+        if per_page <= 0:
+            per_page = 10
         try:
             anniversary_data = Anniversary.objects.filter(territory__territory=territory_id)
         except Anniversary.DoesNotExist:
