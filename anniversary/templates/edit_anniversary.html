@@ -1,0 +1,156 @@
+{% extends 'base_header.html' %}
+{% load static %}
+{% block head_title %}Anniversary Data Input Form | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="mb-6 flex justify-between gap-5 text-center ">
+        <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
+            Anniversary Form
+        </h2>
+        <div class="flex gap-2">
+            <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+            <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="history"></i> History</a>
+        </div>
+    </div>
+
+    <div id="main-container" class="border border-border p-4 rounded-md">
+        <div class="form-container">
+            <div class="form-header">
+                <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-item">
+                        <label class="label" for="dr_id">Doctor RPL ID</label>
+                        <input 
+                            type="text"
+                            id="dr_id"
+                            name="dr_id"
+                            maxlength="10"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor RPL ID"
+                            value="{{ anniversary.dr_id }}"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="dr_name">Doctor Name</label>
+                        <input 
+                            type="text"
+                            id="dr_name"
+                            name="dr_name"
+                            maxlength="100"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor Name"
+                            value="{{ anniversary.dr_name }}"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="anniversary_date">Anniversary Date</label>
+                        <input 
+                            type="date" 
+                            id="anniversary_date" 
+                            name="anniversary_date" 
+                            class="input" 
+                            required 
+                            placeholder="Enter Anniversary Date" 
+                            value="{{ anniversary.anniversary_date|date:'Y-m-d' }}">
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="anniversary_image">Dr. Couple Image</label>
+                        <input
+                            class="input"
+                            type="file"
+                            id="anniversary_image"
+                            name="anniversary_image"
+                            accept="image/jpeg,image/png"
+                            {% if not anniversary.image %} required {% endif %}
+                            placeholder="Upload Dr. Couple Image"
+                            value="{{ anniversary.image }}"
+                            onchange="previewImage(event)"
+                        />
+
+                        <p id="imagePreviewText" class="mt-2 text-sm text-muted">Selected image:</p>
+                        <img 
+                            id="imagePreview" 
+                            src="" 
+                            alt="Selected image" 
+                            class="mt-1 w-24 h-24 rounded-md object-cover border border-gray-300 shadow-sm hidden"
+                        />
+
+                        {% if anniversary.image %}
+                        <p class="mt-2 text-sm">Current image:</p>
+                        <img 
+                            src="{{ anniversary.image.url }}" 
+                            alt="Selected image" 
+                            class="mt-1 w-24 h-24 rounded-md object-cover border border-gray-300 shadow-sm"
+                        />
+                        {% endif %}
+                    </div>
+
+
+                    <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('imagePreview');
+    const text = document.getElementById('imagePreviewText');
+    
+    if (input.files && input.files[0]) {
+        // If a file is selected
+        text.classList.remove('text-muted');
+        preview.classList.remove('hidden');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        // If no file is selected (cancel)
+        text.classList.add('text-muted');
+        preview.classList.add('hidden');
+        preview.src = "";  // Clear the src to avoid showing previous image
+    }
+}
+
+  function submitForm(event) {
+    event.preventDefault(); // prevent default form submission
+
+    const drId = document.getElementById('dr_id').value.trim();
+    const drName = document.getElementById('dr_name').value.trim();
+    const anniversaryDate = document.getElementById('anniversary_date').value;
+    const anniversaryImage = document.getElementById('anniversary_image');
+
+    if (!drId || !drName || !anniversaryDate) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    if (!anniversaryImage.files.length) {
+      alert('Please upload the Doctor Couple image.');
+      return;
+    }
+
+    // Submit the form after validation
+    document.getElementById('uploadForm').submit();
+  }
+
+
+</script>
+{% endblock content %}
