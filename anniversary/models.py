@@ -26,7 +26,7 @@ def get_image_upload_path(instance, filename):
     filename = f"{instance.territory.territory}_{instance.dr_id}_{instance.dr_name}{ext}"
     
     # Construct path and return
-    return os.path.join('anniversary',zone, region, instance.territory.territory,dr_folder, filename)
+    return os.path.join('anniversary_images',zone, region, instance.territory.territory,dr_folder, filename)
 
 class Anniversary(models.Model):
     """

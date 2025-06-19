@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from anniversary.models import Anniversary
 from core.models import Territory
+import os, shutil
+from django.conf import settings
 
 # Create your views here.
 @login_required
@@ -65,3 +67,25 @@ def edit_anniversary(request, anniversary_id):
             print(f"Error updating data: {str(e)}")
             return redirect('edit_anniversary', anniversary_id=anniversary_id)
     return render(request, 'edit_anniversary.html', {'anniversary': anniversary})
+
+@login_required
+def delete_anniversary(request, anniversary_id):
+    try:
+        anniversary = Anniversary.objects.get(id=anniversary_id)
+        
+        if anniversary.image:
+            folder_path = os.path.dirname(anniversary.image.path)
+            safe_root = os.path.join(settings.MEDIA_ROOT, 'anniversary_images')
+            if os.path.commonpath([safe_root]) == os.path.commonpath([safe_root, folder_path]):
+                if os.path.isdir(folder_path):
+                    shutil.rmtree(folder_path)
+                    print(f"Deleted folder: {folder_path}")
+                else:
+                    print(f"Folder not found: {folder_path}")
+            else:
+                print(f"Unsafe folder path skipped: {folder_path}")
+        anniversary.delete()
+        messages.success(request, "Anniversary data deleted successfully.")
+    except Anniversary.DoesNotExist:
+        messages.error(request, "Anniversary data not found.")
+    return redirect('anniversary_form')
