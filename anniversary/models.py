@@ -36,7 +36,7 @@ class Anniversary(models.Model):
     dr_id = models.CharField(max_length=20, unique=True)
     dr_name = models.CharField(max_length=100, blank=True, null=True)
     image = models.ImageField(upload_to=get_image_upload_path, blank=True, null=True, max_length=255)
-    Anniversary_date = models.DateField(blank=True, null=True)
+    anniversary_date = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
