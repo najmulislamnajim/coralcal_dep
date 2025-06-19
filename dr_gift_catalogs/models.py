@@ -42,7 +42,7 @@ class DrGiftCatalog(models.Model):
         GIFT4 = 'Philips Blender 450W Daily Collection (HR2058/91)', 'Philips Blender 450W Daily Collection (HR2058/91)'
         GIFT5 = 'International Scientific Conference Registration', 'International Scientific Conference Registration'
     gift = models.CharField(max_length=255, choices=Gift.choices, default=Gift.GIFT1)
-    conference_image = models.ImageField(upload_to=get_image_upload_path, blank=True, null=True)
+    conference_image = models.ImageField(upload_to=get_image_upload_path, blank=True, null=True, max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
