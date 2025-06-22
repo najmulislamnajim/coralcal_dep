@@ -12,9 +12,9 @@ def login_view(request):
     Handle user login with territory code or admin credentials.
     """
     if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return redirect('knowledge_series')
-        return redirect('territory_home')
+        if not request.user.is_superuser and request.user.userprofile.user_type == 'territory':
+            return redirect('territory_home')
+        return redirect('knowledge_series')
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -22,7 +22,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if not user.is_superuser:
+            if not user.is_superuser and user.userprofile.user_type == 'territory':
                 messages.success(request, "Login successful.")
                 return redirect('territory_home')
             messages.success(request, "Login successful.")
