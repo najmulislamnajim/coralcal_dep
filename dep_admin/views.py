@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 import openpyxl , os, zipfile, shutil
 from io import BytesIO
 from django.http import HttpResponse
-from core.models import Territory
+from core.models import Territory, UserProfile
 from django.conf import settings
 
 # Create your views here.
@@ -26,6 +26,16 @@ def knowledge_series(request):
         direction = request.GET.get("direction", "asc")        
         
         data = BookWishes.objects.select_related('territory').all()
+        # test zone  
+        try:
+            profile = request.user.userprofile
+            if profile.user_type == 'zone':
+                data = data.filter(territory__zone_name=profile.zone_name)
+            elif  profile.user_type == 'region':
+                data = data.filter(territory__region_name=profile.region_name)
+        except UserProfile.DoesNotExist:
+            if not request.user.is_superuser:
+                data = BookWishes.objects.none()
         if search_query:
             data = data.filter(
                 Q(dr_id__icontains=search_query) |
