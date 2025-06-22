@@ -85,6 +85,15 @@ def export_knowledge_series(request):
     
     # Populate the worksheet with data
     queryset = BookWishes.objects.select_related('territory')
+    try:
+        profile = request.user.userprofile
+        if profile.user_type == 'zone':
+            queryset = queryset.filter(territory__zone_name=profile.zone_name)
+        elif  profile.user_type == 'region':
+            queryset = queryset.filter(territory__region_name=profile.region_name)
+    except UserProfile.DoesNotExist:
+        if not request.user.is_superuser:
+            queryset = BookWishes.objects.none()
     for obj in queryset:
         row = [
             obj.dr_id,
