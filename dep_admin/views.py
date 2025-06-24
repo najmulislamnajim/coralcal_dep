@@ -140,13 +140,13 @@ def delete_knowledge_series_data(request, id):
     
 @login_required 
 def download_gift_catalogs(request):
-    base_folder = os.path.join(settings.MEDIA_ROOT, 'conference_images')
-
-    if not os.path.exists(base_folder):
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'conference_images')
+    
+    if not os.path.exists(folder_path):
         messages.error(request, "No images found in this directory.")
         return redirect('gift_catalogs')
-
-    # Create Excel in memory
+    
+    # Create Excel file in memory
     excel_buffer = BytesIO()
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
@@ -154,25 +154,18 @@ def download_gift_catalogs(request):
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Gift Choice']
     worksheet.append(headers)
 
-    # Filter queryset
     queryset = DrGiftCatalog.objects.select_related('territory')
     try:
         profile = request.user.userprofile
         if profile.user_type == 'zone':
             queryset = queryset.filter(territory__zone_name=profile.zone_name)
-        elif profile.user_type == 'region':
+        elif  profile.user_type == 'region':
             queryset = queryset.filter(territory__region_name=profile.region_name)
-        elif profile.user_type == 'territory':
-            queryset = queryset.filter(territory__territory=request.user.username)
     except UserProfile.DoesNotExist:
         if not request.user.is_superuser:
             queryset = DrGiftCatalog.objects.none()
-
-    # Collect image paths and write Excel rows
-    allowed_image_paths = []
     for obj in queryset:
-        # Add to Excel
-        worksheet.append([
+        row = [
             obj.dr_id,
             obj.dr_name,
             obj.territory.territory,
@@ -180,25 +173,23 @@ def download_gift_catalogs(request):
             obj.territory.region_name,
             obj.territory.zone_name,
             obj.gift
-        ])
-
-        # Include image path if it exists
-        if obj.conference_image and obj.conference_image.path and os.path.exists(obj.conference_image.path):
-            relative_path = os.path.relpath(obj.conference_image.path, settings.MEDIA_ROOT)
-            allowed_image_paths.append(relative_path)
+        ]
+        worksheet.append(row)
 
     workbook.save(excel_buffer)
     excel_buffer.seek(0)
-
-    # Create ZIP
+    
+    # Create zip in memory
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        # Add relevant images
-        for rel_path in allowed_image_paths:
-            abs_path = os.path.join(settings.MEDIA_ROOT, rel_path)
-            zip_file.write(abs_path, rel_path)
+        # Add all files from the folder
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
+                zip_file.write(file_path, relative_path)
 
-        # Add Excel
+        # Add the Excel file
         zip_file.writestr('gift_catalogs_data.xlsx', excel_buffer.getvalue())
 
     zip_buffer.seek(0)
