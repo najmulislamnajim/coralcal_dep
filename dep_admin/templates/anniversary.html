@@ -117,9 +117,9 @@
           <!-- right section -->
           <div class="right-actions flex items-center justify-center md:justify-start flex-wrap gap-4">
             {% if user.is_superuser %}
-            <a href="{% url 'download_gift_catalogs' %}" class="button button--md flex-1 button--primary"><i data-lucide="download"></i> Download</a>
+            <a href="{% url 'download_anniversary' %}" class="button button--md flex-1 button--primary"><i data-lucide="download"></i> Download</a>
             {% else %}
-            <a href="{% url 'download_gift_catalogs' %}" class="button button--md flex-1 button--primary pointer-events-none opacity-50 cursor-not-allowed"><i data-lucide="download"></i> Download</a>
+            <a href="{% url 'download_anniversary' %}" class="button button--md flex-1 button--primary pointer-events-none opacity-50 cursor-not-allowed"><i data-lucide="download"></i> Download</a>
             {% endif %}
             <button class="button button--md flex-1 button--secondary copy-table-data" id="copyTableData" onclick="copyTableData('doctorTable')">
               <i data-lucide="copy"></i> Copy

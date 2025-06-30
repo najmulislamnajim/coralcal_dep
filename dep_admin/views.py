@@ -396,3 +396,62 @@ def export_anniversary(request):
     
     return response
 
+@login_required 
+def download_anniverysary(request):
+    folder_path = os.path.join(settings.MEDIA_ROOT, 'anniversary_images')
+    
+    if not os.path.exists(folder_path):
+        messages.error(request, "No images found in this directory.")
+        return redirect('anniversary')
+    
+    # Create Excel file in memory
+    excel_buffer = BytesIO()
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Anniversary Data"
+    headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Anniversary Date']
+    worksheet.append(headers)
+
+    queryset = Anniversary.objects.select_related('territory')
+    try:
+        profile = request.user.userprofile
+        if profile.user_type == 'zone':
+            queryset = queryset.filter(territory__zone_name=profile.zone_name)
+        elif  profile.user_type == 'region':
+            queryset = queryset.filter(territory__region_name=profile.region_name)
+    except UserProfile.DoesNotExist:
+        if not request.user.is_superuser:
+            queryset = Anniversary.objects.none()
+    for obj in queryset:
+        row = [
+            obj.dr_id,
+            obj.dr_name,
+            obj.territory.territory,
+            obj.territory.territory_name,
+            obj.territory.region_name,
+            obj.territory.zone_name,
+            obj.anniversary_date
+        ]
+        worksheet.append(row)
+
+    workbook.save(excel_buffer)
+    excel_buffer.seek(0)
+    
+    # Create zip in memory
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        # Add all files from the folder
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
+                zip_file.write(file_path, relative_path)
+
+        # Add the Excel file
+        zip_file.writestr('anniversary_data.xlsx', excel_buffer.getvalue())
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename="anniversary_data_bundle.zip"'
+    return response
+

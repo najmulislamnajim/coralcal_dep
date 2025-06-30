@@ -11,4 +11,5 @@ urlpatterns = [
     path('gift_catalogs/', views.gift_catalogs, name='gift_catalogs'),
     path('anniversary', views.anniversary, name='anniversary'),
     path('export_anniversary', views.export_anniversary, name='export_anniversary'),
+    path('download_anniversary', views.download_anniverysary, name='download_anniversary')
 ]
