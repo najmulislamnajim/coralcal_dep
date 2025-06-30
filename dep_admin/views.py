@@ -346,3 +346,53 @@ def anniversary(request):
         paginator = Paginator(data, per_page)
         page_obj = paginator.get_page(page_number)    
     return render(request, 'anniversary.html',{'data':page_obj, 'search_query':search_query, 'per_page':per_page, 'sort':sort, 'direction':direction}) 
+
+@login_required 
+def export_anniversary(request):
+    """
+    Export the Gift Catalogs data to an Excel file.
+    """
+
+    # Create a new workbook and add a worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Anniversary Data"
+    
+    # Define the header row
+    headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Anniversary Date']
+    worksheet.append(headers)
+    
+    # Populate the worksheet with data
+    queryset = Anniversary.objects.select_related('territory')
+    try:
+        profile = request.user.userprofile
+        if profile.user_type == 'zone':
+            queryset = queryset.filter(territory__zone_name=profile.zone_name)
+        elif  profile.user_type == 'region':
+            queryset = queryset.filter(territory__region_name=profile.region_name)
+    except UserProfile.DoesNotExist:
+        if not request.user.is_superuser:
+            queryset = Anniversary.objects.none()
+    for obj in queryset:
+        row = [
+            obj.dr_id,
+            obj.dr_name,
+            obj.territory.territory,
+            obj.territory.territory_name,
+            obj.territory.region_name,
+            obj.territory.zone_name,
+            obj.anniversary_date.strftime('%Y-%m-%d')
+        ]
+        worksheet.append(row)
+    
+    # Save the workbook to a BytesIO object
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Create a response with the Excel file
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="anniversary_data.xlsx"'
+    
+    return response
+
