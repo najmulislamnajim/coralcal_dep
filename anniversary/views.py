@@ -57,20 +57,26 @@ def edit_anniversary(request, anniversary_id):
         dr_id = request.POST.get('dr_id')
         dr_name = request.POST.get('dr_name')
         anniversary_date = request.POST.get('anniversary_date')
-        anniversary_image = request.FILES.get('anniversary_image')
+        new_image = request.FILES.get('anniversary_image')
 
         # Validate the data
-        if not (dr_id and dr_name and anniversary_date and anniversary_image):
+        if not (dr_id and dr_name and anniversary_date):
             messages.error(request, "All fields are required.")
             return redirect('edit_anniversary', anniversary_id=anniversary_id)
 
         # Update the data in the database
         try:
+            # Check and delete the old image if a new one is provided
+            if new_image and anniversary.image:
+                    if os.path.isfile(anniversary.image.path):
+                        os.remove(anniversary.image.path)
+            
+            # Update the anniversary object
             anniversary.dr_id = dr_id
             anniversary.dr_name = dr_name
             anniversary.anniversary_date = anniversary_date
-            if anniversary_image:
-                anniversary.image = anniversary_image
+            if new_image:
+                anniversary.image = new_image
             anniversary.save()
             messages.success(request, "Anniversary data updated successfully.")
             return redirect('anniversary_form')
