@@ -107,7 +107,9 @@ def delete_anniversary(request, anniversary_id):
         messages.success(request, "Anniversary data deleted successfully.")
     except Anniversary.DoesNotExist:
         messages.error(request, "Anniversary data not found.")
-    return redirect('anniversary_form')
+    if not request.user.is_superuser:
+        return redirect('anniversary_form')
+    return redirect('anniversary')
 
 @login_required
 def anniversary_history(request):
