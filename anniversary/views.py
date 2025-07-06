@@ -80,7 +80,9 @@ def edit_anniversary(request, anniversary_id):
                 anniversary.image = new_image
             anniversary.save()
             messages.success(request, "Anniversary data updated successfully.")
-            return redirect('anniversary_form')
+            if not request.user.is_superuser:
+                return redirect('anniversary_form')
+            return redirect('anniversary')
         except Exception as e:
             messages.error(request, f"Error updating data: {str(e)}")
             print(f"Error updating data: {str(e)}")
