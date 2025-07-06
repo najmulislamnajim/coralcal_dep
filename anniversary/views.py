@@ -38,7 +38,17 @@ def anniversary(request):
             messages.error(request, f"Error saving data: {str(e)}")
             print(f"Error saving data: {str(e)}")
             return redirect('anniversary_form')
-    return render(request, 'anniversary_form.html')
+        
+    if request.method == 'GET':
+        try:
+            territory = Territory.objects.get(territory=request.user.username)
+            obj = Anniversary.objects.filter(territory=territory)
+        except Exception as e:
+            pass
+        
+        total_data = obj.count() if obj else 0
+        print(total_data)
+    return render(request, 'anniversary_form.html', context={"count":total_data})
 
 @login_required
 def edit_anniversary(request, anniversary_id):
