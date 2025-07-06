@@ -17,6 +17,12 @@
         </div>
     </div>
 
+    {% if count >= 2 %}
+    <div class="bg-red-500 text-white p-2 rounded-md mb-4">
+      <p>You have uploaded data for 2 doctors. To edit or delete, please visit the history.</p>
+    </div>
+    {% else %}
+
     <div id="main-container" class="border border-border p-4 rounded-md">
         <div class="form-container">
             <div class="form-header">
@@ -73,6 +79,8 @@
             </div>
         </div>
     </div>
+    {% endif %}
+
   </div>
 </div>
 
