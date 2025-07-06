@@ -81,7 +81,7 @@ def edit_anniversary(request, anniversary_id):
             anniversary.save()
             messages.success(request, "Anniversary data updated successfully.")
             if not request.user.is_superuser:
-                return redirect('anniversary_form')
+                return redirect('anniversary_history')
             return redirect('anniversary')
         except Exception as e:
             messages.error(request, f"Error updating data: {str(e)}")
@@ -110,7 +110,7 @@ def delete_anniversary(request, anniversary_id):
     except Anniversary.DoesNotExist:
         messages.error(request, "Anniversary data not found.")
     if not request.user.is_superuser:
-        return redirect('anniversary_form')
+        return redirect('anniversary_history')
     return redirect('anniversary')
 
 @login_required
