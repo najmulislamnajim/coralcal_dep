@@ -40,6 +40,7 @@ def anniversary(request):
             return redirect('anniversary_form')
         
     if request.method == 'GET':
+        obj = None
         try:
             territory = Territory.objects.get(territory=request.user.username)
             obj = Anniversary.objects.filter(territory=territory)
