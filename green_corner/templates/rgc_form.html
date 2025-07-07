@@ -27,6 +27,12 @@
                 </div>
             </div>
 
+            {% if is_exist %}
+            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg dark:text-red-400 flex gap-2" role="alert">
+                <i data-lucide="circle-x"></i><span class="font-medium">Not allowed!</span> Already a territory added data for the Radiant Green Corner.
+            </div>
+            {% else %}
+
             <div id="main-container" class="border border-border p-4 rounded-md">
                 <div class="form-container">
                     <div class="form-header">
@@ -145,6 +151,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -32,4 +32,26 @@ def rgc_form(request):
             messages.error(request, "Error adding Green Corner data: " + str(e))
             print("Error adding Green Corner data: " + str(e))
             return redirect('rgc_upload')
-    return render(request, 'rgc_form.html', {"count":1})
+    if request.method == 'GET':
+        territory_id = request.user
+        try:
+            territory= Territory.objects.get(territory=territory_id)
+            region_name = territory.region_name
+            try:
+                obj = GreenCorner.objects.get(territory=territory)
+                return render(request, 'rgc_view.html', {"obj":obj})
+            except GreenCorner.DoesNotExist:
+                try:
+                    is_exist = GreenCorner.objects.filter(
+                        territory__region_name=region_name
+                    ).exclude(
+                        territory=territory
+                    ).exists()
+                    print(is_exist)
+                except Exception as e:
+                    print("Error fetching Green Corner data: " + str(e))
+        except Exception as e:
+            messages.error(request, "Error fetching Green Corner data: " + str(e))
+            print("Error fetching Green Corner data: " + str(e))
+            return redirect('rgc_upload')
+    return render(request, 'rgc_form.html', {"is_exist":is_exist})
