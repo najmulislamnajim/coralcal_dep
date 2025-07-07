@@ -15,3 +15,11 @@ class GreenCorner(models.Model):
     second_medicine_plant = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'green_corner'
+        verbose_name = 'Green Corner'
+        verbose_name_plural = 'Green Corner'
+        
+    def __str__(self):
+        return self.dr_id+self.dr_name
