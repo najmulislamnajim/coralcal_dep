@@ -11,8 +11,8 @@ class GreenCorner(models.Model):
     first_flower_plant = models.CharField(max_length=30, blank=True, null=True)
     second_flower_plant = models.CharField(max_length=30, blank=True, null=True)
     third_flower_plant = models.CharField(max_length=30, blank=True, null=True)
-    first_medicine_plant = models.CharField(max_length=30, blank=True, null=True)
-    second_medicine_plant = models.CharField(max_length=30, blank=True, null=True)
+    first_medicinal_plant = models.CharField(max_length=30, blank=True, null=True)
+    second_medicinal_plant = models.CharField(max_length=30, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
