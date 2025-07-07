@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'dr_gift_catalogs',
     'dep_admin',
     'anniversary',
+    'green_corner',
 ]
 
 MIDDLEWARE = [
