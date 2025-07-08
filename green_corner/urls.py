@@ -4,4 +4,5 @@ from . import views
 urlpatterns = [
     path('upload', views.rgc_form, name='rgc_upload'),
     path('edit/<str:instance_id>', views.rgc_edit_view, name='rgc_edit'),
+    path('delete/<str:instance_id>', views.rgc_delete_view, name='rgc_delete'),
 ]

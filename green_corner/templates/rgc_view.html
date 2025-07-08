@@ -33,7 +33,7 @@
         <div class="flex gap-4 justify-between items-center mb-4">
             <a id="book-item" href="javascript:void(0);" onclick="toggleBookContent()" class="button button--sm button--primary"><i id="book-icon" data-lucide="eye-off"></i>Hide</a>
             <a href="{% url 'rgc_edit' obj.id %}" class="button button--sm button--primary">Edit</a>
-            <a href="{% url 'delete_knowledge_series' obj.id %}"" class="button button--sm button--primary">Delete</a>
+            <a href="{% url 'rgc_delete' obj.id %}"" class="button button--sm button--primary">Delete</a>
         </div>
         <hr>
 

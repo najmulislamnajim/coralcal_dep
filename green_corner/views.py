@@ -99,3 +99,17 @@ def rgc_edit_view(request, instance_id):
             messages.error(request, "Error updating Green Corner data: " + str(e))
             print("Error updating Green Corner data: " + str(e))
             return redirect('rgc_edit', instance_id=instance_id)
+        
+def rgc_delete_view(request, instance_id):
+    try:
+        obj = GreenCorner.objects.get(id=instance_id)
+        obj.delete()
+        messages.success(request, "Green Corner data deleted successfully.")
+        return redirect('rgc_upload')
+    except GreenCorner.DoesNotExist:
+        messages.error(request, "Green Corner data not found.")
+        return redirect('rgc_upload')
+    except Exception as e:
+        messages.error(request, "Error deleting Green Corner data: " + str(e))
+        print("Error deleting Green Corner data: " + str(e))
+        return redirect('rgc_upload')
