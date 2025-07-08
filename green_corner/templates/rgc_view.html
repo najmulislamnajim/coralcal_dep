@@ -32,7 +32,7 @@
     <div id="main-container" class="border border-border p-4 rounded-md">
         <div class="flex gap-4 justify-between items-center mb-4">
             <a id="book-item" href="javascript:void(0);" onclick="toggleBookContent()" class="button button--sm button--primary"><i id="book-icon" data-lucide="eye-off"></i>Hide</a>
-            <a href="{% url 'edit_ks' obj.id %}" class="button button--sm button--primary">Edit</a>
+            <a href="{% url 'rgc_edit' obj.id %}" class="button button--sm button--primary">Edit</a>
             <a href="{% url 'delete_knowledge_series' obj.id %}"" class="button button--sm button--primary">Delete</a>
         </div>
         <hr>
@@ -57,38 +57,43 @@
             <div>
               <h2 class="py-4">Selected Flower Plant:</h2>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {% if 'Hasna Hena' in obj.first_flower_plant or 'Hasna Hena' in obj.second_flower_plant or 'Hasna Hena' in obj.third_flower_plant %}
                 <div>
-                  {% if 'Hasna Hena' in obj.first_flower_plant or 'Hasna Hena' in obj.second_flower_plant or 'Hasna Hena' in obj.third_flower_plant %}
                   <img src="{% static 'images/flower/hasnahena.png' %}" alt="Hasna Hena" class="object-cover w-full h-32">
                   <p>Hasna Hena</p>
-                  {% endif %}
                 </div>
-                <div>
+                  {% endif %}
+
                   {% if 'Rongon' in obj.first_flower_plant or 'Rongon' in obj.second_flower_plant or 'Rongon' in obj.third_flower_plant %}
+                <div>
                   <img src="{% static 'images/flower/rongon.png' %}" alt="Hasna Hena" class="object-cover w-full h-32">
                   <p>Rongon</p>
-                  {% endif %}
                 </div>
-                <div>
+                  {% endif %}
+
                   {% if 'Joba' in obj.first_flower_plant or 'Joba' in obj.second_flower_plant or 'Joba' in obj.third_flower_plant %}
+                <div>
                   <img src="{% static 'images/flower/joba.png' %}" alt="Hasna Hena" class="object-cover w-full h-32">
                   <p>Joba</p>
-                  {% endif %}
                 </div>
-                <div>
+                  {% endif %}
+
                   {% if 'Dolon Chapa' in obj.first_flower_plant or 'Dolon Chapa' in obj.second_flower_plant or 'Dolon Chapa' in obj.third_flower_plant %}
+                <div>
                   <img src="{% static 'images/flower/dolon_chapa.png' %}" alt="Hasna Hena" class="object-cover w-full h-32">
                   <p>Dolon Chapa</p>
-                  {% endif %}
                 </div>
+                {% endif %}
+
+                {% if 'Gondhoraj' in obj.first_flower_plant or 'Gondhoraj' in obj.second_flower_plant or 'Gondhoraj' in obj.third_flower_plant %}
                 <div>
-                  {% if 'Gondhoraj' in obj.first_flower_plant or 'Gondhoraj' in obj.second_flower_plant or 'Gondhoraj' in obj.third_flower_plant %}
                   <img src="{% static 'images/flower/gondhoraj.png' %}" alt="Hasna Hena" class="object-cover w-full h-32">
                   <p>Gondhoraj</p>
-                  {% endif %}
                 </div>
+                  {% endif %}
               </div>
             </div>
+
             <div>
               <h2 class="py-4">Selected Medicinal Plant:</h2>
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
