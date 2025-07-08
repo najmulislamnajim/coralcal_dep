@@ -11,10 +11,17 @@
             Welcome {{ request.user.username }}
         </h2>
     </div>
+    <h2 class="flex text-2xl font-bold text-primary gap-2 py-2 my-2"><i class="mt-1" data-lucide="trending-up"></i> Events</h2>
+    <div class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
+      <a class="button button--sm button--primary" href="{% url 'anniversary_form' %}">Enlighten Together</a>
+      <a class="button button--sm button--primary" href="{% url 'rgc_upload' %}">Green Corner</a>
+  </div>
+
+  <div class="card">
+    <h2 class="flex text-2xl font-bold text-primary gap-2 py-2 mb-2"><i class="mt-1" data-lucide="history"></i> History</h2>
     <div class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
       <a class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'book_choice' %}">Knowledge Series</a>
-      <a class="button button--sm button--primary  pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'gift_choice' %}">Gift Catalogs</a>
-      <a class="button button--sm button--primary" href="{% url 'anniversary_form' %}">Enlighten Together</a>
+      <a class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'gift_choice' %}">Gift Catalogs</a>
   </div>
 </div>
 {% endblock content %}
