@@ -94,6 +94,8 @@ def rgc_edit_view(request, instance_id):
             obj.second_medicinal_plant = second_medicinal_plant
             obj.save()
             messages.success(request, "Green Corner data updated successfully.")
+            if request.user.is_superuser:
+                return redirect('rgc')
             return redirect('rgc_upload')
         except Exception as e:
             messages.error(request, "Error updating Green Corner data: " + str(e))
@@ -105,11 +107,17 @@ def rgc_delete_view(request, instance_id):
         obj = GreenCorner.objects.get(id=instance_id)
         obj.delete()
         messages.success(request, "Green Corner data deleted successfully.")
+        if request.user.is_superuser:
+            return redirect('rgc')
         return redirect('rgc_upload')
     except GreenCorner.DoesNotExist:
         messages.error(request, "Green Corner data not found.")
+        if request.user.is_superuser:
+            return redirect('rgc')
         return redirect('rgc_upload')
     except Exception as e:
         messages.error(request, "Error deleting Green Corner data: " + str(e))
         print("Error deleting Green Corner data: " + str(e))
+        if request.user.is_superuser:
+            return redirect('rgc')
         return redirect('rgc_upload')
