@@ -1,0 +1,274 @@
+{% extends "base_header.html" %}
+{% load static %}
+{% block head_title %}Radiant Green Corner Form | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+  .thumbnail {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+  .thumbnail.selected {
+    border: 2px solid #3b82f6;
+    transform: scale(1.05);
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto">
+    <div class="card">
+        <div>
+            <div class="mb-6 flex justify-between gap-5 text-center ">
+                <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
+                    Radiant Green Corner
+                </h2>
+                <div class="flex gap-2">
+                    <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+                </div>
+            </div>
+
+            {% if is_exist %}
+            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg dark:text-red-400 flex gap-2" role="alert">
+                <i data-lucide="circle-x"></i><span class="font-medium">Not allowed!</span> Already a territory added data for the Radiant Green Corner.
+            </div>
+            {% else %}
+
+            <div id="main-container" class="border border-border p-4 rounded-md">
+                <div class="form-container">
+                    <div class="form-header">
+                        <form method="post" class="flex flex-col gap-6" enctype="multipart/form-data" onsubmit="return submitForm()">
+                            {% csrf_token %}
+                            <div class="form-item">
+                                <label class="label" for="dr_id">Doctor RPL ID</label>
+                                <input 
+                                    type="text"
+                                    id="dr_id"
+                                    name="dr_id"
+                                    maxlength="10"
+                                    class="input"
+                                    required
+                                    placeholder="Enter Doctor RPL ID"
+                                    value="{{ obj.dr_id }}"
+                                />
+                            </div>
+
+                            <div class="form-item">
+                                <label class="label" for="dr_name">Doctor Name</label>
+                                <input 
+                                    type="text"
+                                    id="dr_name"
+                                    name="dr_name"
+                                    maxlength="100"
+                                    class="input"
+                                    required
+                                    placeholder="Enter Doctor Name"
+                                    value="{{ obj.dr_name }}"
+                                />
+                            </div>
+                            <div class="form-item">
+                                <label class="label" for="dr_address">Doctor Address</label>
+                                <input 
+                                    type="text"
+                                    id="dr_address"
+                                    name="dr_address"
+                                    maxlength="100"
+                                    class="input"
+                                    required
+                                    placeholder="Enter Doctor Address"
+                                    value="{{ obj.dr_address }}"
+                                />
+                            </div>
+                            <div class="form-item">
+                                <label class="label" for="rm_phone">RM Mobile</label>
+                                <input 
+                                    type="text"
+                                    id="rm_phone"
+                                    name="rm_phone"
+                                    maxlength="100"
+                                    class="input"
+                                    required
+                                    placeholder="Enter RM Mobile Number"
+                                    value="{{ obj.rm_phone }}"
+                                />
+                            </div>
+
+                            <div class="form-item">
+                                <label class="label" for="select_book">Select Flower Plant(3 Items)</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Hasna Hena" data-type="flower" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/flower/hasnahena.png' %}" alt="flower-1" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Hasna Hena</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Rongon" data-type="flower" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/flower/rongon.png' %}" alt="flower-2" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Rongon</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Dolon Chapa" data-type="flower" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/flower/dolon_chapa.png' %}" alt="flower-3" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Dolon Chapa</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Gondhoraj" data-type="flower" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/flower/gondhoraj.png' %}" alt="flower-4" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Gondhoraj</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Joba" data-type="flower" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/flower/joba.png' %}" alt="flower-5" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Joba</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-item">
+                                <label class="label" for="select_book">Select Medicinal Plant(2 Items)</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Mint" data-type="medicinal" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/medicine/mint.png' %}" alt="medicinal-1" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Mint</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Lemon Grass" data-type="medicinal" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/medicine/lemon_grass.png' %}" alt="medicinal-2" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Lemon Grass</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Aloe Vera" data-type="medicinal" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/medicine/aloe_vera.png' %}" alt="medicinal-3" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Aloe Vera</p>
+                                    </div>
+                                    <div class="thumbnail cursor-pointer rounded-xl overflow-hidden border border-gray-300" data-name="Tulsi" data-type="medicinal" onclick="selectThumbnail(this)">
+                                        <img src="{% static 'images/medicine/tulsi.png' %}" alt="medicinal-4" class="object-cover w-full h-32">
+                                        <p class="text-center text-xs text-gray-600 mt-2">Tulsi</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden inputs for flower and medicinal plants -->
+                            <input type="hidden" name="first_flower_plant" id="first_flower_plant">
+                            <input type="hidden" name="second_flower_plant" id="second_flower_plant">
+                            <input type="hidden" name="third_flower_plant" id="third_flower_plant">
+
+                            <input type="hidden" name="first_medicinal_plant" id="first_medicinal_plant">
+                            <input type="hidden" name="second_medicinal_plant" id="second_medicinal_plant">
+
+                            <button type="submit" class="button button--md button--primary">
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full text-center">
+        <p id="errorMessage" class="text-sm text-red-600 font-medium mb-4"></p>
+        <button onclick="closeModal()" class="button button--sm button--primary">Close</button>
+    </div>
+</div>
+
+<script>
+  const selectedFlowers = [
+    "{{ obj.first_flower_plant|escapejs }}",
+    "{{ obj.second_flower_plant|escapejs }}",
+    "{{ obj.third_flower_plant|escapejs }}"
+  ].filter(Boolean);
+
+  const selectedMedicinals = [
+    "{{ obj.first_medicinal_plant|escapejs }}",
+    "{{ obj.second_medicinal_plant|escapejs }}"
+  ].filter(Boolean);
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.thumbnail').forEach(el => {
+      const name = el.getAttribute('data-name');
+      const type = el.getAttribute('data-type');
+
+      if (
+        (type === 'flower' && selectedFlowers.includes(name)) ||
+        (type === 'medicinal' && selectedMedicinals.includes(name))
+      ) {
+        el.classList.add('selected');
+      }
+    });
+
+    // Fill hidden inputs on load
+    document.getElementById('first_flower_plant').value = selectedFlowers[0] || "";
+    document.getElementById('second_flower_plant').value = selectedFlowers[1] || "";
+    document.getElementById('third_flower_plant').value = selectedFlowers[2] || "";
+
+    document.getElementById('first_medicinal_plant').value = selectedMedicinals[0] || "";
+    document.getElementById('second_medicinal_plant').value = selectedMedicinals[1] || "";
+  });
+
+  function selectThumbnail(element) {
+    const name = element.getAttribute('data-name');
+    const type = element.getAttribute('data-type');
+    const isSelected = element.classList.contains('selected');
+
+    if (isSelected) {
+      element.classList.remove('selected');
+      if (type === 'flower') {
+        const index = selectedFlowers.indexOf(name);
+        if (index > -1) selectedFlowers.splice(index, 1);
+      } else {
+        const index = selectedMedicinals.indexOf(name);
+        if (index > -1) selectedMedicinals.splice(index, 1);
+      }
+    } else {
+      if (type === 'flower') {
+        if (selectedFlowers.length >= 3) {
+          showModal("You can only select 3 flower plants.");
+          return;
+        }
+        selectedFlowers.push(name);
+      } else {
+        if (selectedMedicinals.length >= 2) {
+          showModal("You can only select 2 medicinal plants.");
+          return;
+        }
+        selectedMedicinals.push(name);
+      }
+      element.classList.add('selected');
+    }
+
+    // Update hidden inputs
+    document.getElementById('first_flower_plant').value = selectedFlowers[0] || "";
+    document.getElementById('second_flower_plant').value = selectedFlowers[1] || "";
+    document.getElementById('third_flower_plant').value = selectedFlowers[2] || "";
+
+    document.getElementById('first_medicinal_plant').value = selectedMedicinals[0] || "";
+    document.getElementById('second_medicinal_plant').value = selectedMedicinals[1] || "";
+  }
+
+  function submitForm() {
+    const drId = document.getElementById('dr_id').value.trim();
+    const drName = document.getElementById('dr_name').value.trim();
+
+    if (!drId || !drName) {
+      showModal('Please fill out all required fields.');
+      return false;
+    }
+
+    if (selectedFlowers.length !== 3 || selectedMedicinals.length !== 2) {
+      showModal('Please select exactly 3 flower plants and 2 medicinal plants.');
+      return false;
+    }
+
+    return true;
+  }
+
+  function showModal(message) {
+    document.getElementById('errorMessage').innerText = message;
+    document.getElementById('errorModal').classList.remove('hidden');
+    document.getElementById('errorModal').classList.add('flex');
+  }
+
+  function closeModal() {
+    document.getElementById('errorModal').classList.add('hidden');
+    document.getElementById('errorModal').classList.remove('flex');
+  }
+</script>
+
+{% endblock %}
