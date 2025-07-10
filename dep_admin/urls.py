@@ -13,4 +13,5 @@ urlpatterns = [
     path('export_anniversary', views.export_anniversary, name='export_anniversary'),
     path('download_anniversary', views.download_anniverysary, name='download_anniversary'),
     path('rgc', views.green_corner, name='rgc'),
+    path('access_control', views.access_control_view, name='access_control'),
 ]

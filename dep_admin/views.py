@@ -5,13 +5,14 @@ from knowledge_series.models import BookWishes
 from dr_gift_catalogs.models import DrGiftCatalog
 from django.db.models import Q
 from django.core.paginator import Paginator
-import openpyxl , os, zipfile, shutil
+import openpyxl , os, zipfile, shutil, json
 from io import BytesIO
 from django.http import HttpResponse
 from core.models import Territory, UserProfile
 from django.conf import settings
 from anniversary.models import Anniversary
 from green_corner.models import GreenCorner
+from .models import AccessControl
 
 # Create your views here.
 @login_required
@@ -505,3 +506,23 @@ def green_corner(request):
     return render(request, 'green_corner.html', {
         'data': page_obj, 'search_query': search_query, 'per_page': per_page, 'sort': sort, 'direction': direction
     })
+    
+def access_control_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        for key, value in data.items():
+            try:
+                obj = AccessControl.objects.get(key=key)
+                obj.is_active = value
+                obj.save()
+            except Exception as e:
+                messages.error(request, f"Error updating {key}: {str(e)}")
+                return redirect('access_control')
+        messages.success(request, f"Successfully updated {key}.")
+        return redirect('access_control')
+                
+    if request.method == 'GET':
+        access_controls = AccessControl.objects.all()
+        access_control_states = {item.key: item.is_active for item in access_controls}
+        return render(request, 'access_control.html', {'access_control': access_control_states})
+            

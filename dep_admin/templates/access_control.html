@@ -1,0 +1,116 @@
+{% extends "index.html" %}
+{% block dashboard %}
+<div class="xl:container xl:mx-auto">
+
+  <div class="px-0 md:px-0 pb-4">
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-2">
+      <h2 class="text-xl md:text-2xl font-semibold flex items-center gap-2 [&_svg]:size-4">
+        Welcome, {{ user.username }}
+      </h2>
+    </div>
+  </div>
+
+  <!-- main card -->
+  <div class="uploaded-data border border-muted rounded-md bg-background p-4 shadow-sm">
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+      <h2 class="text-xl md:text-2xl font-semibold flex items-center gap-2 [&_svg]:size-4">
+        <span class="rounded-full p-1 border border-border text-primary">
+          <i data-lucide="sliders-horizontal"></i>
+        </span>
+        Radiant Green Corner
+      </h2>
+    </div>
+
+    <!-- static toggle form -->
+    <div class="my-container">
+      <form id="featureToggleForm" class="space-y-4">
+        {% csrf_token %}
+        <div class="flex flex-col justify-between p-4 gap-4 bg-white">
+
+          <!-- Knowledge Series -->
+          <div>
+            <label class="inline-flex items-center cursor-pointer">
+              <span class="text-sm font-medium text-black w-50">Knowledge Series</span>
+              <input type="checkbox" id="knowledgeSeriesToggle" class="sr-only peer toggle-switch" {% if access_control.knowledge_series %}checked{% endif %}>
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+            </label>
+          </div>
+
+          <!-- Gift Corner -->
+          <div>
+            <label class="inline-flex items-center cursor-pointer">
+              <span class="text-sm font-medium text-black w-50">Gift Catalogs</span>
+              <input type="checkbox" id="giftCatalogsToggle" class="sr-only peer toggle-switch" {% if access_control.gift_catalogs %}checked{% endif %}>
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+            </label>
+          </div>
+
+          <!-- Enlighten Together -->
+          <div>
+            <label class="inline-flex items-center cursor-pointer ">
+              <span class="text-sm font-medium text-black w-50">Enlighten Together</span>
+              <input type="checkbox" id="enlightenTogetherToggle" class="sr-only peer toggle-switch" {% if access_control.anniversary %}checked{% endif %}>
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+            </label>
+          </div>
+
+          <!-- Green Corner -->
+          <div>
+            <label class="inline-flex items-center cursor-pointer">
+              <span class="text-sm font-medium text-black w-50">Green Corner</span>
+              <input type="checkbox" id="greenCornerToggle" class="sr-only peer toggle-switch" {% if access_control.green_corner %}checked{% endif %}>
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+            </label>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- JS: auto-submit toggles -->
+<script>
+  function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+  }
+
+  function collectToggles() {
+    return {
+      knowledge_series: document.getElementById('knowledgeSeriesToggle')?.checked || false,
+      gift_catalogs: document.getElementById('giftCatalogsToggle')?.checked || false,
+      anniversary: document.getElementById('enlightenTogetherToggle')?.checked || false,
+      green_corner: document.getElementById('greenCornerToggle')?.checked || false,
+    };
+  }
+
+  function autoSubmitToggles() {
+    const data = collectToggles();
+
+    fetch('/dep/admin/access_control', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCsrfToken()
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Server error");
+      return res.json();
+    })
+    .then(resData => {
+      console.log("Toggles saved:", resData);
+    })
+    .catch(err => {
+      console.error("Toggle save failed:", err);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.toggle-switch').forEach(toggle => {
+      toggle.addEventListener('change', autoSubmitToggles);
+    });
+  });
+</script>
+{% endblock dashboard %}
