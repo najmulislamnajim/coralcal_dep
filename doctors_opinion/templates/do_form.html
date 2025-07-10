@@ -1,0 +1,234 @@
+{% extends 'base_header.html' %}
+{% load static %}
+{% block head_title %}Doctor's Opinion | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block content %}
+<div
+  class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto"
+>
+  <div class="card">
+    <div class="mb-6 flex justify-between gap-5 text-center ">
+        <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
+            Doctor's Opinion Form
+        </h2>
+        <div class="flex gap-2">
+            <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+            <a href="{% url 'anniversary_history' %}" class="button button--sm button--primary"><i data-lucide="history"></i> History</a>
+        </div>
+    </div>
+
+    <div id="main-container" class="border border-border p-4 rounded-md">
+        <div class="form-container">
+            <div class="form-header">
+                <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-item">
+                        <label class="label" for="dr_id">Doctor RPL ID</label>
+                        <input 
+                            type="text"
+                            id="dr_id"
+                            name="dr_id"
+                            maxlength="10"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor RPL ID"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="dr_name">Doctor Name</label>
+                        <input 
+                            type="text"
+                            id="dr_name"
+                            name="dr_name"
+                            maxlength="100"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor Name"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="dr_address">Doctor Address</label>
+                        <input 
+                            type="text"
+                            id="dr_address"
+                            name="dr_address"
+                            maxlength="100"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor Chamber Address"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label" for="dr_phone">Doctor Mobile</label>
+                        <input 
+                            type="text"
+                            id="dr_phone"
+                            name="dr_phone"
+                            maxlength="100"
+                            class="input"
+                            required
+                            placeholder="Enter Doctor Mobile Number"
+                        />
+                    </div>
+
+                    <div class="form-item">
+                        <label class="label">Indications</label>
+                        <div id="indication-wrapper" class="flex flex-col gap-4">
+                            <!-- Indication fields will be added here dynamically -->
+                        </div>
+                        <button type="button" onclick="addIndication()" class="flex items-center gap-1 text-sm text-primary mt-2">
+                            <i data-lucide="plus-circle"></i> Add Indication
+                        </button>
+                    </div>
+
+                    <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  </div>
+    <!-- Error Modal -->
+    <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+        <h3 class="text-lg font-semibold text-red-600 mb-4">Form Error</h3>
+        <p id="errorModalMessage" class="text-gray-800 mb-6"></p>
+        <div class="text-right">
+        <button onclick="closeErrorModal()" class="button button--sm button--primary">OK</button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Inline Error Box -->
+    <div id="inlineErrorBox" class="hidden border border-red-300 bg-red-100 text-red-700 p-4 rounded-md relative">
+    <button onclick="closeInlineError()" class="absolute top-2 right-2 text-red-700 hover:text-red-900">
+        <i data-lucide="x-circle"></i>
+    </button>
+    <p id="inlineErrorMessage" class="text-sm"></p>
+    </div>
+
+    <!-- Floating Error Toast -->
+    <div id="flyingErrorToast" class="hidden fixed top-6 right-6 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300 ease-in-out">
+    <div class="flex items-center justify-between gap-4">
+        <p id="flyingErrorMessage" class="text-sm"></p>
+        <button onclick="closeFlyingError()" class="text-red-600 hover:text-red-800">
+        <i data-lucide="x-circle"></i>
+        </button>
+    </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showFlyingError(message) {
+        const toast = document.getElementById('flyingErrorToast');
+        const text = document.getElementById('flyingErrorMessage');
+
+        text.textContent = message;
+        toast.classList.remove('hidden');
+        toast.classList.add('opacity-100');
+
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            closeFlyingError();
+        }, 3000);
+    }
+
+    function closeFlyingError() {
+        const toast = document.getElementById('flyingErrorToast');
+        toast.classList.add('hidden');
+    }
+
+
+  function addIndication(value = '') {
+    const wrapper = document.getElementById('indication-wrapper');
+
+    const container = document.createElement('div');
+    container.className = 'flex flex-col gap-1';
+
+    const textarea = document.createElement('textarea');
+    textarea.name = 'indications[]';
+    textarea.placeholder = 'Enter an indication';
+    textarea.className = 'input flex-1 resize-none';
+    textarea.maxLength = 255;
+    textarea.rows = 4;
+    textarea.value = value;
+
+    // Auto-expand function
+    textarea.addEventListener('input', autoExpand);
+
+    // Char count
+    const charCount = document.createElement('div');
+    charCount.className = 'text-xs text-gray-500 text-right';
+    charCount.textContent = `${textarea.value.length}/255`;
+
+    textarea.addEventListener('input', () => {
+      charCount.textContent = `${textarea.value.length}/255`;
+    });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.innerHTML = `<i data-lucide="x-circle"></i>`;
+    removeBtn.className = 'text-red-500 hover:text-red-700 self-end';
+    removeBtn.onclick = () => {
+      if (wrapper.children.length > 1) {
+        wrapper.removeChild(container);
+      } else {
+        showFlyingError("At least one indication is required.");
+      }
+    };
+
+    container.appendChild(textarea);
+    container.appendChild(charCount);
+    container.appendChild(removeBtn);
+    wrapper.appendChild(container);
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    autoExpand.call(textarea);
+  }
+
+  function autoExpand() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  }
+
+  function submitForm(event) {
+    event.preventDefault();
+
+    const drId = document.getElementById('dr_id').value.trim();
+    const drName = document.getElementById('dr_name').value.trim();
+    const drAddress = document.getElementById('dr_address').value.trim();
+    const drPhone = document.getElementById('dr_phone').value.trim();
+
+    const indications = document.querySelectorAll('textarea[name="indications[]"]');
+    const hasIndication = Array.from(indications).some(input => input.value.trim() !== '');
+
+    if (!drId || !drName || !drAddress || !drPhone) {
+      showFlyingError("Please fill out all required doctor fields.");
+      return;
+    }
+
+    if (!hasIndication) {
+      showFlyingError("Please enter at least one valid indication.");
+      return;
+    }
+
+    document.getElementById('uploadForm').submit();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    addIndication();
+  });
+</script>
+
+
+{% endblock content %}

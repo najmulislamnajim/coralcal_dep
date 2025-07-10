@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'dep_admin',
     'anniversary',
     'green_corner',
+    'doctors_opinion',
 ]
 
 MIDDLEWARE = [
