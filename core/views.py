@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from dep_admin.models import AccessControl
 
 # Create your views here.
 def home(request):
@@ -45,4 +46,13 @@ def user_logout(request):
 
 @login_required
 def territory_home(request):
-    return render(request, 'home.html')
+    access_control = AccessControl.objects.all()
+    access_control_states = {item.key:item.is_active for item in access_control}
+    events = {
+        'knowledge_series': {'label': 'Knowledge Series', 'url_name': 'book_choice', 'is_active': access_control_states['knowledge_series']},
+        'gift_catalogs': {'label': 'Gift Catalogs', 'url_name': 'gift_choice', 'is_active': access_control_states['gift_catalogs']},
+        'anniversary': {'label': 'Enlighten Together', 'url_name': 'anniversary_form', 'is_active': access_control_states['anniversary']},
+        'green_corner': {'label': 'Green Corner', 'url_name': 'rgc_upload', 'is_active': access_control_states['green_corner']},
+    }
+    print(events)
+    return render(request, 'home.html', {'events': events})

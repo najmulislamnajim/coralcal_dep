@@ -12,16 +12,29 @@
         </h2>
     </div>
     <h2 class="flex text-2xl font-bold text-primary gap-2 py-2 my-2"><i class="mt-1" data-lucide="trending-up"></i> Events</h2>
-    <div class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
-      <a class="button button--sm button--primary" href="{% url 'anniversary_form' %}">Enlighten Together</a>
-      <a class="button button--sm button--primary" href="{% url 'rgc_upload' %}">Green Corner</a>
+    <div id="runningEvent" class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
+      {% for event in events.values %}
+        {% if event.is_active %}
+          <a class="button button--sm button--primary" href="{% url event.url_name %}">{{ event.label }}</a>
+        {% endif %}
+      {% endfor %}
   </div>
 
   <div class="card">
     <h2 class="flex text-2xl font-bold text-primary gap-2 py-2 mb-2"><i class="mt-1" data-lucide="history"></i> History</h2>
-    <div class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
-      <a class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'book_choice' %}">Knowledge Series</a>
-      <a class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'gift_choice' %}">Gift Catalogs</a>
+    <div id="pastEvent" class="flex gap-4 justify-center flex-wrap flex-col md:flex-row mb-4">
+      {% for event in events.values %}
+        {% if event.is_active == False %}
+          <a class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url event.url_name %}">{{ event.label }}</a>
+        {% endif %}
+      {% endfor %}
   </div>
 </div>
+
+<script>
+  const anniversary = `<a id="anniversary" class="button button--sm button--primary" href="{% url 'anniversary_form' %}">Enlighten Together</a>`;
+  const knowledge_series = `<a id="knowledge_series" class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'book_choice' %}">Knowledge Series</a>`;
+  const green_corner = `<a id="green_corner" class="button button--sm button--primary" href="{% url 'rgc_upload' %}">Green Corner</a>`;
+  const gift_catalogs = `<a id="gift_catalogs" class="button button--sm button--primary pointer-events-none opacity-50 cursor-not-allowed" href="{% url 'gift_choice' %}">Gift Catalogs</a>`;
+</script>
 {% endblock content %}
