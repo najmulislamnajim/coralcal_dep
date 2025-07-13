@@ -138,3 +138,10 @@ def do_edit_view(request, pk):
         'specialties': specialties
     }
     return render(request, 'do_edit.html', context)
+
+@login_required
+def do_delete_view(request, pk):
+    obj = get_object_or_404(DoctorOpinion, pk=pk)
+    obj.delete()
+    messages.success(request, "Doctor's opinion deleted successfully.")
+    return redirect('do_history')
