@@ -14,6 +14,7 @@ from anniversary.models import Anniversary
 from green_corner.models import GreenCorner
 from .models import AccessControl
 from doctors_opinion.models import DoctorOpinion
+from openpyxl.styles import Alignment
 
 # Create your views here.
 @login_required
@@ -642,5 +643,66 @@ def doctors_opinion_view(request):
             'total_pages': paginator.num_pages,
         }
         return render(request, 'doctors_opinion.html', context)
+
+@login_required 
+def dop_export(request):
+    """
+    Export the Doctor's Opinion data to an Excel file.
+    """
+
+    # Create a new workbook and add a worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Doctor's Opinion Data"
+    
+    # Define the header row
+    headers = ['Dr. RPL ID', 'Dr. Name','Dr. Address', 'Dr. Mobile', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Indications']
+    worksheet.append(headers)
+    
+    # Populate the worksheet with data
+    queryset = DoctorOpinion.objects.select_related('territory')
+    try:
+        profile = request.user.userprofile
+        if profile.user_type == 'zone':
+            queryset = queryset.filter(territory__zone_name=profile.zone_name)
+        elif  profile.user_type == 'region':
+            queryset = queryset.filter(territory__region_name=profile.region_name)
+    except UserProfile.DoesNotExist:
+        if not request.user.is_superuser:
+            queryset = DoctorOpinion.objects.none()
+    for obj in queryset:
+        indications_text = "\n".join(f"{i+1}. {ind.indication_text}" for i, ind in enumerate(obj.indications.all()))
+        row = [
+            obj.dr_id,
+            obj.dr_name,
+            obj.dr_address,
+            obj.dr_phone,
+            obj.territory.territory,
+            obj.territory.territory_name,
+            obj.territory.region_name,
+            obj.territory.zone_name,
+            indications_text
+        ]
+        worksheet.append(row)
+        # Apply wrapText only to the last cell (Indications column)
+        indications_cell = worksheet.cell(row=worksheet.max_row, column=9)  # 9th column = Indications
+        indications_cell.alignment = Alignment(wrap_text=True)
+    
+    for column_cells in worksheet.columns:
+        max_length = max(len(str(cell.value or '')) for cell in column_cells)
+        worksheet.column_dimensions[column_cells[0].column_letter].width = max_length + 5
+
+    
+    # Save the workbook to a BytesIO object
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+    
+    # Create a response with the Excel file
+    response = HttpResponse(buffer.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="doctors_opinion_data.xlsx"'
+    
+    return response
+
 
             
