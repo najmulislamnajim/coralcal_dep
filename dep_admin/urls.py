@@ -15,4 +15,5 @@ urlpatterns = [
     path('rgc', views.green_corner, name='rgc'),
     path('export_rgc', views.export_rgc, name='export_rgc'),
     path('access_control', views.access_control_view, name='access_control'),
+    path('dop', views.doctors_opinion_view, name='dop'),
 ]

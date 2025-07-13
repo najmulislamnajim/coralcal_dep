@@ -13,6 +13,7 @@ from django.conf import settings
 from anniversary.models import Anniversary
 from green_corner.models import GreenCorner
 from .models import AccessControl
+from doctors_opinion.models import DoctorOpinion
 
 # Create your views here.
 @login_required
@@ -578,4 +579,68 @@ def access_control_view(request):
         access_controls = AccessControl.objects.all()
         access_control_states = {item.key: item.is_active for item in access_controls}
         return render(request, 'access_control.html', {'access_control': access_control_states})
+
+
+@login_required
+def doctors_opinion_view(request):
+    if request.method == 'GET':
+        search_query = request.GET.get('search', '')
+        page_number = int(request.GET.get('page') or 1)
+        per_page = int(request.GET.get("per_page") or 10)
+        sort = request.GET.get("sort", "territory")
+        direction = request.GET.get("direction", "asc")
+        
+        data = DoctorOpinion.objects.select_related('territory').all()
+        try:
+            profile = request.user.userprofile
+            if profile.user_type == 'zone':
+                data = data.filter(territory__zone_name=profile.zone_name)
+            elif  profile.user_type == 'region':
+                data = data.filter(territory__region_name=profile.region_name)
+        except UserProfile.DoesNotExist:
+            if not request.user.is_superuser:
+                data = DoctorOpinion.objects.none()
+                
+        if search_query:
+            data = data.filter(
+                Q(dr_id__icontains=search_query) |
+                Q(dr_name__icontains=search_query) |
+                Q(territory__territory__icontains=search_query) |
+                Q(territory__territory_name__icontains=search_query) |
+                Q(territory__region_name__icontains=search_query) |
+                Q(territory__zone_name__icontains=search_query) | 
+                Q(dr_address__icontains=search_query) |
+                Q(dr_phone__icontains=search_query)
+            )
+        
+        sort_by = sort
+        if sort_by == "territory":
+            sort_by = "territory__territory"
+        elif sort_by == "territory_name":
+            sort_by = "territory__territory_name"
+        elif sort_by == "region":
+            sort_by = "territory__region_name"
+        elif sort_by == "zone":
+            sort_by = "territory__zone_name"
+        elif sort_by == "dr_id":
+            sort_by = "dr_id"
+        elif sort_by == "dr_name":
+            sort_by = "dr_name"
+        if direction == "desc":
+            sort_by = f"-{sort_by}"
+            
+        data = data.order_by(sort_by)
+        paginator = Paginator(data, per_page)
+        page_obj = paginator.get_page(page_number)
+        context = {
+            'data': page_obj,
+            'search_query': search_query,
+            'sort': sort,
+            'direction': direction,
+            'per_page': per_page,
+            'page_number': page_number,
+            'total_pages': paginator.num_pages,
+        }
+        return render(request, 'doctors_opinion.html', context)
+
             
