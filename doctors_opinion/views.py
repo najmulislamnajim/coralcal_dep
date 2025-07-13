@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import DoctorOpinion, DoctorIndication
-from core.models import Territory
+from core.models import Territory, UserProfile
 from django.db.models import Q
 from django.core.paginator import Paginator
 
@@ -106,6 +106,12 @@ def do_edit_view(request, pk):
         dr_phone = request.POST.get('dr_phone')
         dr_specialty = request.POST.get('dr_specialty')
         indications = request.POST.getlist('indications[]')
+        
+        # Validation
+        if not dr_id or not dr_name or not dr_address or not dr_phone or not dr_specialty or not indications:
+            error_message = "Please fill in all the fields."
+            messages.error(request, error_message)
+            return redirect('do_edit', pk=pk)
 
         # Update DoctorOpinion fields
         obj.dr_id = dr_id
@@ -123,7 +129,16 @@ def do_edit_view(request, pk):
                 DoctorIndication.objects.create(doctor_opinion=obj, indication_text=cleaned_text)
 
         messages.success(request, "Doctor's opinion updated successfully.")
-        return redirect('do_history')
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('dop')
+                else:
+                    return redirect('do_history')
+            except UserProfile.DoesNotExist:
+                return redirect('do_history')
+        return redirect('dop')
 
     # For GET method: pre-fill data
     existing_indications = list(obj.indications.values_list('indication_text', flat=True))
@@ -141,7 +156,29 @@ def do_edit_view(request, pk):
 
 @login_required
 def do_delete_view(request, pk):
-    obj = get_object_or_404(DoctorOpinion, pk=pk)
-    obj.delete()
-    messages.success(request, "Doctor's opinion deleted successfully.")
-    return redirect('do_history')
+    try:
+        obj = get_object_or_404(DoctorOpinion, pk=pk)
+        obj.delete()
+        messages.success(request, "Doctor's opinion deleted successfully.")
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('dop')
+                else:
+                    return redirect('do_history')
+            except UserProfile.DoesNotExist:
+                return redirect('do_history')
+        return redirect('dop')
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('dop')
+                else:
+                    return redirect('do_history')
+            except UserProfile.DoesNotExist:
+                return redirect('do_history')
+        return redirect('dop')
