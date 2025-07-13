@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from green_corner.models import GreenCorner
-from core.models import Territory
+from core.models import Territory, UserProfile
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -94,9 +94,17 @@ def rgc_edit_view(request, instance_id):
             obj.second_medicinal_plant = second_medicinal_plant
             obj.save()
             messages.success(request, "Green Corner data updated successfully.")
-            if request.user.is_superuser:
-                return redirect('rgc')
-            return redirect('rgc_upload')
+
+            if not request.user.is_superuser:
+                try:
+                    profile = request.user.userprofile
+                    if profile.user_type == 'zone' or profile.user_type == 'region':
+                        return redirect('rgc')
+                    else:
+                        return redirect('rgc_upload')
+                except UserProfile.DoesNotExist:
+                    return redirect('rgc_upload')
+            return redirect('rgc')
         except Exception as e:
             messages.error(request, "Error updating Green Corner data: " + str(e))
             print("Error updating Green Corner data: " + str(e))
@@ -107,17 +115,38 @@ def rgc_delete_view(request, instance_id):
         obj = GreenCorner.objects.get(id=instance_id)
         obj.delete()
         messages.success(request, "Green Corner data deleted successfully.")
-        if request.user.is_superuser:
-            return redirect('rgc')
-        return redirect('rgc_upload')
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('rgc')
+                else:
+                    return redirect('rgc_upload')
+            except UserProfile.DoesNotExist:
+                return redirect('rgc_upload')
+        return redirect('rgc')
     except GreenCorner.DoesNotExist:
         messages.error(request, "Green Corner data not found.")
-        if request.user.is_superuser:
-            return redirect('rgc')
-        return redirect('rgc_upload')
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('rgc')
+                else:
+                    return redirect('rgc_upload')
+            except UserProfile.DoesNotExist:
+                return redirect('rgc_upload')
+        return redirect('rgc')
     except Exception as e:
         messages.error(request, "Error deleting Green Corner data: " + str(e))
         print("Error deleting Green Corner data: " + str(e))
-        if request.user.is_superuser:
-            return redirect('rgc')
-        return redirect('rgc_upload')
+        if not request.user.is_superuser:
+            try:
+                profile = request.user.userprofile
+                if profile.user_type == 'zone' or profile.user_type == 'region':
+                    return redirect('rgc')
+                else:
+                    return redirect('rgc_upload')
+            except UserProfile.DoesNotExist:
+                return redirect('rgc_upload')
+        return redirect('rgc')
