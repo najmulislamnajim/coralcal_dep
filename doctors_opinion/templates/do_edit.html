@@ -1,0 +1,200 @@
+{% extends 'base_header.html' %}
+{% load static %}
+{% block head_title %}Edit Doctor's Opinion | CoralCal Doctor Engagement Platform{% endblock %}
+
+{% block content %}
+<div class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto">
+  <div class="card">
+    <div class="mb-6 flex justify-between gap-5 text-center">
+      <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
+        Edit Doctor's Opinion Form
+      </h2>
+      <div class="flex gap-2">
+        <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+        <a href="{% url 'do_history' %}" class="button button--sm button--primary"><i data-lucide="history"></i> History</a>
+      </div>
+    </div>
+
+    <div id="main-container" class="border border-border p-4 rounded-md">
+      <div class="form-container">
+        <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Doctor RPL ID -->
+          <div class="form-item">
+            <label class="label" for="dr_id">Doctor RPL ID</label>
+            <input type="text" id="dr_id" name="dr_id" maxlength="10" class="input" required
+              placeholder="Enter Doctor RPL ID" value="{{ obj.dr_id }}" />
+          </div>
+
+          <!-- Doctor Name -->
+          <div class="form-item">
+            <label class="label" for="dr_name">Doctor Name</label>
+            <input type="text" id="dr_name" name="dr_name" maxlength="100" class="input" required
+              placeholder="Enter Doctor Name" value="{{ obj.dr_name }}" />
+          </div>
+
+          <!-- Doctor Address -->
+          <div class="form-item">
+            <label class="label" for="dr_address">Doctor Address</label>
+            <input type="text" id="dr_address" name="dr_address" maxlength="100" class="input" required
+              placeholder="Enter Doctor Chamber Address" value="{{ obj.dr_address }}" />
+          </div>
+
+          <!-- Doctor Phone -->
+          <div class="form-item">
+            <label class="label" for="dr_phone">Doctor Mobile</label>
+            <input type="text" id="dr_phone" name="dr_phone" maxlength="100" class="input" required
+              placeholder="Enter Doctor Mobile Number" value="{{ obj.dr_phone }}" />
+          </div>
+
+          <!-- Doctor Specialty -->
+          <div class="form-item">
+            <label class="label" for="dr_specialty">Doctor Specialty</label>
+            <select id="dr_specialty" name="dr_specialty" class="input" required>
+              <option value="">Select a specialty</option>
+              {% for spec in specialties %}
+              <option value="{{ spec }}" {% if obj.dr_specialty == spec %}selected{% endif %}>{{ spec }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Indications -->
+          <div class="form-item">
+            <label class="label">Indications</label>
+            <div id="indication-wrapper" class="flex flex-col gap-4">
+              <!-- JavaScript will populate here -->
+            </div>
+            <button type="button" onclick="addIndication()" class="flex items-center gap-1 text-sm text-primary mt-2">
+              <i data-lucide="plus-circle"></i> Add Indication
+            </button>
+          </div>
+
+          <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Error Toast -->
+  <div id="flyingErrorToast"
+    class="hidden fixed top-6 right-6 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300 ease-in-out">
+    <div class="flex items-center justify-between gap-4">
+      <p id="flyingErrorMessage" class="text-sm"></p>
+      <button onclick="closeFlyingError()" class="text-red-600 hover:text-red-800">
+        <i data-lucide="x-circle"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showFlyingError(message) {
+    const toast = document.getElementById('flyingErrorToast');
+    const text = document.getElementById('flyingErrorMessage');
+
+    text.textContent = message;
+    toast.classList.remove('hidden');
+    toast.classList.add('opacity-100');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    setTimeout(() => {
+      closeFlyingError();
+    }, 3000);
+  }
+
+  function closeFlyingError() {
+    const toast = document.getElementById('flyingErrorToast');
+    toast.classList.add('hidden');
+  }
+
+  function addIndication(value = '') {
+    const wrapper = document.getElementById('indication-wrapper');
+
+    const container = document.createElement('div');
+    container.className = 'flex flex-col gap-1';
+
+    const textarea = document.createElement('textarea');
+    textarea.name = 'indications[]';
+    textarea.placeholder = 'Enter an indication';
+    textarea.className = 'input flex-1 resize-none';
+    textarea.maxLength = 255;
+    textarea.rows = 4;
+    textarea.value = value;
+
+    textarea.addEventListener('input', autoExpand);
+
+    const charCount = document.createElement('div');
+    charCount.className = 'text-xs text-gray-500 text-right';
+    charCount.textContent = `${textarea.value.length}/255`;
+
+    textarea.addEventListener('input', () => {
+      charCount.textContent = `${textarea.value.length}/255`;
+    });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.innerHTML = `<i data-lucide="x-circle"></i>`;
+    removeBtn.className = 'text-red-500 hover:text-red-700 self-end';
+    removeBtn.onclick = () => {
+      if (wrapper.children.length > 1) {
+        wrapper.removeChild(container);
+      } else {
+        showFlyingError("At least one indication is required.");
+      }
+    };
+
+    container.appendChild(textarea);
+    container.appendChild(charCount);
+    container.appendChild(removeBtn);
+    wrapper.appendChild(container);
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    autoExpand.call(textarea);
+  }
+
+  function autoExpand() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
+  }
+
+  function submitForm(event) {
+    event.preventDefault();
+
+    const drId = document.getElementById('dr_id').value.trim();
+    const drName = document.getElementById('dr_name').value.trim();
+    const drAddress = document.getElementById('dr_address').value.trim();
+    const drPhone = document.getElementById('dr_phone').value.trim();
+    const drSpecialty = document.getElementById('dr_specialty').value.trim();
+
+    const indications = document.querySelectorAll('textarea[name="indications[]"]');
+    const hasIndication = Array.from(indications).some(input => input.value.trim() !== '');
+
+    if (!drId || !drName || !drAddress || !drPhone) {
+      showFlyingError("Please fill out all required doctor fields.");
+      return;
+    }
+    if (!drSpecialty) {
+      showFlyingError("Please select a specialty.");
+      return;
+    }
+
+    if (!hasIndication) {
+      showFlyingError("Please enter at least one valid indication.");
+      return;
+    }
+
+    document.getElementById('uploadForm').submit();
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const existingIndications = {{ indications|safe }};
+    if (existingIndications.length > 0) {
+      existingIndications.forEach(text => addIndication(text));
+    } else {
+      addIndication();
+    }
+  });
+</script>
+{% endblock %}

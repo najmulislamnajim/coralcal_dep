@@ -89,3 +89,52 @@ def do_history(request):
     }
     
     return render(request, 'do_history.html', context)
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import DoctorOpinion, DoctorIndication
+from core.models import Territory  # adjust based on your project
+
+def do_edit_view(request, pk):
+    obj = get_object_or_404(DoctorOpinion, pk=pk)
+
+    if request.method == 'POST':
+        dr_id = request.POST.get('dr_id')
+        dr_name = request.POST.get('dr_name')
+        dr_address = request.POST.get('dr_address')
+        dr_phone = request.POST.get('dr_phone')
+        dr_specialty = request.POST.get('dr_specialty')
+        indications = request.POST.getlist('indications[]')
+
+        # Update DoctorOpinion fields
+        obj.dr_id = dr_id
+        obj.dr_name = dr_name
+        obj.dr_address = dr_address
+        obj.dr_phone = dr_phone
+        obj.dr_specialty = dr_specialty
+        obj.save()
+
+        # Delete existing indications and add new ones
+        obj.indications.all().delete()
+        for text in indications:
+            cleaned_text = text.strip()
+            if cleaned_text:
+                DoctorIndication.objects.create(doctor_opinion=obj, indication_text=cleaned_text)
+
+        messages.success(request, "Doctor's opinion updated successfully.")
+        return redirect('do_history')
+
+    # For GET method: pre-fill data
+    existing_indications = list(obj.indications.values_list('indication_text', flat=True))
+    specialties = [
+        "Medicine", "GP", "Gynaecology", "Orthopedic", "Neurology", "Dentist",
+        "Diabetologist", "ENT", "Surgery", "Nephro-Urology", "Cardiology",
+        "Oncology", "Skin-VD", "Pediatric", "Rheumatology", "Eye", "Endocrinology", "Psychology"
+    ]
+    context = {
+        'obj': obj,
+        'indications': existing_indications,
+        'specialties': specialties
+    }
+    return render(request, 'do_edit.html', context)
