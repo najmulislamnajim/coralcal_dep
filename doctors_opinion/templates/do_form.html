@@ -75,6 +75,36 @@
                     </div>
 
                     <div class="form-item">
+                      <label class="label" for="dr_specialty">Doctor Specialty</label>
+                      <select 
+                          id="dr_specialty" 
+                          name="dr_specialty" 
+                          class="input" 
+                          required
+                      >
+                          <option value="">Select a specialty</option>
+                          <option value="Medicine">Medicine</option>
+                          <option value="GP">GP</option>
+                          <option value="Gynaecology">Gynaecology</option>
+                          <option value="Orthopedic">Orthopedic</option>
+                          <option value="Neurology">Neurology</option>
+                          <option value="Dentist">Dentist</option>
+                          <option value="Diabetologist">Diabetologist</option>
+                          <option value="ENT">ENT</option>
+                          <option value="Surgery">Surgery</option>
+                          <option value="Nephro-Urology">Nephro-Urology</option>
+                          <option value="Cardiology">Cardiology</option>
+                          <option value="Oncology">Oncology</option>
+                          <option value="Skin-VD">Skin-VD</option>
+                          <option value="Pediatric">Pediatric</option>
+                          <option value="Rheumatology">Rheumatology</option>
+                          <option value="Eye">Eye</option>
+                          <option value="Endocrinology">Endocrinology</option>
+                          <option value="Psychology">Psychology</option>
+                      </select>
+                    </div>
+
+                    <div class="form-item">
                         <label class="label">Indications</label>
                         <div id="indication-wrapper" class="flex flex-col gap-4">
                             <!-- Indication fields will be added here dynamically -->
@@ -208,12 +238,17 @@
     const drName = document.getElementById('dr_name').value.trim();
     const drAddress = document.getElementById('dr_address').value.trim();
     const drPhone = document.getElementById('dr_phone').value.trim();
+    const drSpecialty = document.getElementById('dr_specialty').value.trim();
 
     const indications = document.querySelectorAll('textarea[name="indications[]"]');
-    const hasIndication = Array.from(indications).some(input => input.value.trim() !== '');
+    const hasIndication = Array.from(indications).some(input => input.value.trim() !== '');   
 
     if (!drId || !drName || !drAddress || !drPhone) {
       showFlyingError("Please fill out all required doctor fields.");
+      return;
+    }
+    if (!drSpecialty) {
+      showFlyingError("Please select a specialty.");
       return;
     }
 
