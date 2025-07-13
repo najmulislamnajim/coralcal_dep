@@ -67,7 +67,7 @@
           <div>
             <label class="inline-flex items-center cursor-pointer">
               <span class="text-sm font-medium text-black w-50">Doctor's Opinion</span>
-              <input type="checkbox" id="greenCornerToggle" class="sr-only peer toggle-switch" {% if access_control.doctors_opinion %}checked{% endif %}>
+              <input type="checkbox" id="doctorsOpinionToggle" class="sr-only peer toggle-switch" {% if access_control.doctors_opinion %}checked{% endif %}>
               <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:bg-green-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
             </label>
           </div>
@@ -90,6 +90,7 @@
       gift_catalogs: document.getElementById('giftCatalogsToggle')?.checked || false,
       anniversary: document.getElementById('enlightenTogetherToggle')?.checked || false,
       green_corner: document.getElementById('greenCornerToggle')?.checked || false,
+      doctors_opinion: document.getElementById('doctorsOpinionToggle')?.checked || false
     };
   }
 
