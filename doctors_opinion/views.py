@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import DoctorOpinion, DoctorIndication
 from core.models import Territory
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 # Create your views here.
 @login_required
@@ -45,3 +47,45 @@ def do_form_view(request):
             messages.error(request, error_message)
             return redirect('do_form')
     return render(request, 'do_form.html')
+
+
+@login_required
+def do_history(request):
+    search_query = request.GET.get("search", "")
+    sort = request.GET.get("sort", "created_at")
+    direction = request.GET.get("direction", "desc")
+    per_page = int(request.GET.get("per_page", 10))
+    page = request.GET.get("page", 1)
+    
+    # sorting logic
+    if direction == "desc":
+        sort = f"-{sort}"
+    
+    doctor_opinions = DoctorOpinion.objects.filter(territory=Territory.objects.get(territory=request.user.username))
+    
+    #search filter
+    if search_query:
+        doctor_opinions = doctor_opinions.filter(
+            Q(dr_id__icontains=search_query) |
+            Q(dr_name__icontains=search_query) |
+            Q(dr_address__icontains= search_query) |
+            Q(dr_specialty__icontains=search_query) | 
+            Q(dr_phone__icontains=search_query)
+        )
+    # sorting
+    doctor_opinions = doctor_opinions.order_by(sort)
+    
+    # pagination
+    paginator = Paginator(doctor_opinions, per_page)
+    page_obj = paginator.get_page(page)
+    
+    context = {
+        'data': page_obj,
+        'search_query': search_query,
+        'sort': sort,
+        'direction': direction,
+        'per_page': per_page,
+        'page': page,
+    }
+    
+    return render(request, 'do_history.html', context)
