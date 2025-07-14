@@ -12,4 +12,5 @@ urlpatterns = [
     path('anniversary/', include('anniversary.urls')),
     path('rgc/', include('green_corner.urls')),
     path('doctors_opinion/', include('doctors_opinion.urls')),
+    path('doctors_data/', include('doctors_data.urls')),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
