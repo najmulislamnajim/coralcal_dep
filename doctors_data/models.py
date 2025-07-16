@@ -5,7 +5,7 @@ class Doctor(models.Model):
     id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     speciality = models.CharField(max_length=255)
-    Designation = models.TextField()
+    designation = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -17,7 +17,7 @@ class Doctor(models.Model):
         verbose_name_plural = 'Doctors'
         
 class Chamber(models.Model):
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='chambers')
     address = models.TextField()
     phone = models.CharField(max_length=55)
     division = models.CharField(max_length=255)
