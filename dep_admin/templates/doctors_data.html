@@ -1,0 +1,167 @@
+{% extends "index.html" %}
+{% block dashboard %}
+<div class="xl:container xl:mx-auto">
+
+  <!-- Page header -->
+  <div class="px-0 md:px-0 pb-4">
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-2">
+      <h2 class="text-xl md:text-2xl font-semibold flex items-center gap-2 [&_svg]:size-4">
+        Welcome, {{ user.username }}
+      </h2>
+    </div>
+  </div>
+
+  <!-- Doctor data table -->
+  <div class="uploaded-data border border-muted rounded-md bg-background p-4 shadow-sm">
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+      <h2 class="text-xl md:text-2xl font-semibold flex items-center gap-2 [&_svg]:size-4">
+        <span class="rounded-full p-1 border border-border text-primary">
+          <i data-lucide="circle-user-round"></i>
+        </span>
+        Doctor's Data
+      </h2>
+    </div>
+
+    <div class="my-container">
+      <!-- Search and actions -->
+      <div class="table-actions flex justify-between items-center flex-wrap gap-5 mb-6">
+        <form method="get">
+          <input type="search" name="search_query" class="input" placeholder="Search..." value="{{ search_query }}" />
+        </form>
+
+        <div class="flex gap-4">
+          <a href="{% url 'dop_export' %}" class="button button--md button--primary">
+            <i data-lucide="download"></i> Download
+          </a>
+        </div>
+      </div>
+
+      <!-- Table content -->
+      <div class="table-container">
+        <table class="table" id="doctorTable">
+          <thead class="table-head">
+            <tr class="table-row">
+              <th class="table-head">#</th>
+              <th class="table-head">Dr. RPL ID</th>
+              <th class="table-head">Dr. Name</th>
+              <th class="table-head">Speciality</th>
+              <th class="table-head">Designation</th>
+              <th class="table-head">Chamber List</th>
+            </tr>
+          </thead>
+          <tbody class="table-body">
+            {% for item in data %}
+            <tr class="table-row">
+              <td class="table-cell">{{ forloop.counter }}</td>
+              <td class="table-cell">{{ item.id }}</td>
+              <td class="table-cell">{{ item.name }}</td>
+              <td class="table-cell">{{ item.speciality }}</td>
+              <td class="table-cell">{{ item.designation }}</td>
+              <td class="table-cell">
+                <!-- JSON data in a hidden script tag -->
+                <script id="chambers-data-{{ item.id }}" type="application/json">
+                  {{ item.chambers_json|safe }}
+                </script>
+                <button
+                  class="button button--sm button--outline view-chambers-btn"
+                  data-doctor-id="{{ item.id }}"
+                  data-doctor-name="{{ item.name }}"
+                >
+                  View
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal dialog -->
+<dialog id="doctorModal" class="rounded-md p-6 max-w-4xl w-full border border-gray-300 shadow-lg
+         top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 fixed z-50 bg-white">
+  <div class="flex justify-between items-center mb-4">
+    <h3 id="doctorModalTitle" class="text-xl font-semibold">Chambers</h3>
+    <button
+      type="button"
+      aria-label="Close modal"
+      onclick="closeDoctorModal()"
+      class="text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none"
+    >
+      &times;
+    </button>
+  </div>
+  <div id="doctorModalContent" class="overflow-auto max-h-[60vh]"></div>
+</dialog>
+
+<script>
+  (() => {
+    const modal = document.getElementById("doctorModal");
+    const modalTitle = document.getElementById("doctorModalTitle");
+    const modalContent = document.getElementById("doctorModalContent");
+
+    window.openDoctorModal = () => modal.showModal();
+    window.closeDoctorModal = () => {
+      modalContent.innerHTML = "";
+      modal.close();
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll(".view-chambers-btn");
+
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          try {
+            const doctorId = btn.dataset.doctorId;
+            const doctorName = btn.dataset.doctorName;
+            const script = document.getElementById(`chambers-data-${doctorId}`);
+            const chambers = JSON.parse(script.textContent.trim());
+
+            modalTitle.textContent = `Chambers of ${doctorName}`;
+
+            if (!Array.isArray(chambers) || chambers.length === 0) {
+              modalContent.innerHTML = `<p>No chambers found for Dr. ${doctorName}.</p>`;
+            } else {
+              let tableHtml = `
+                <table class="w-full border-collapse border border-gray-300 text-left text-sm">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="border border-gray-300 px-2 py-1">#</th>
+                      <th class="border border-gray-300 px-2 py-1">Address</th>
+                      <th class="border border-gray-300 px-2 py-1">Phone</th>
+                      <th class="border border-gray-300 px-2 py-1">District</th>
+                      <th class="border border-gray-300 px-2 py-1">Upazila</th>
+                      <th class="border border-gray-300 px-2 py-1">Thana</th>
+                    </tr>
+                  </thead>
+                  <tbody>`;
+
+              chambers.forEach((chamber, i) => {
+                tableHtml += `
+                  <tr>
+                    <td class="border border-gray-300 px-2 py-1">${i + 1}</td>
+                    <td class="border border-gray-300 px-2 py-1">${chamber.address}</td>
+                    <td class="border border-gray-300 px-2 py-1">${chamber.phone}</td>
+                    <td class="border border-gray-300 px-2 py-1">${chamber.district}</td>
+                    <td class="border border-gray-300 px-2 py-1">${chamber.upazila}</td>
+                    <td class="border border-gray-300 px-2 py-1">${chamber.thana}</td>
+                  </tr>`;
+              });
+
+              tableHtml += "</tbody></table>";
+              modalContent.innerHTML = tableHtml;
+            }
+
+            openDoctorModal();
+          } catch (error) {
+            console.error("Failed to parse chambers JSON or render modal:", error);
+            alert("Error displaying chambers data. Please check the console.");
+          }
+        });
+      });
+    });
+  })();
+</script>
+{% endblock %}

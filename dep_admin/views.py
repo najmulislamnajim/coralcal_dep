@@ -15,6 +15,7 @@ from green_corner.models import GreenCorner
 from .models import AccessControl
 from doctors_opinion.models import DoctorOpinion
 from openpyxl.styles import Alignment
+from doctors_data.models import Doctor, Chamber
 
 # Create your views here.
 @login_required
@@ -704,5 +705,73 @@ def dop_export(request):
     
     return response
 
+@login_required
+def doctors_data(request):
+    if request.method == 'GET':
+        # Get query params with default values
+        search_query = request.GET.get('search_query', '')
+        sort = request.GET.get('sort', 'dr_id')
+        direction = request.GET.get('direction', 'asc')
+        per_page = int(request.GET.get('per_page', 10))
+        page_number = int(request.GET.get('page_number', 1))
+
+        # Base queryset
+        data = Doctor.objects.all()
+
+        # Filtering (search)
+        if search_query:
+            data = data.filter(
+                Q(id__icontains=search_query) |
+                Q(name__icontains=search_query) |
+                Q(speciality__icontains=search_query) |
+                Q(designation__icontains=search_query) |
+                Q(chambers__district__icontains=search_query) |
+                Q(chambers__upazila__icontains=search_query) |
+                Q(chambers__thana__icontains=search_query) |
+                Q(chambers__address__icontains=search_query) |
+                Q(chambers__phone__icontains=search_query)
+            ).distinct()
+
+        # Sorting
+        sort_by = {
+            "dr_id": "id",
+            "dr_name": "name"
+        }.get(sort, sort)
+
+        if direction == "desc":
+            sort_by = f"-{sort_by}"
+
+        data = data.order_by(sort_by)
+
+        # Pagination
+        paginator = Paginator(data, per_page)
+        page_obj = paginator.get_page(page_number)
+
+        # Serialize chambers to JSON for each doctor
+        for doctor in page_obj:
+            chambers_list = []
+            for ch in doctor.chambers.all():
+                chambers_list.append({
+                    "address": ch.address,
+                    "phone": ch.phone,
+                    "division": ch.division,
+                    "district": ch.district,
+                    "upazila": ch.upazila,
+                    "thana": ch.thana,
+                })
+            doctor.chambers_json = json.dumps(chambers_list)
+
+        # Pass context to template
+        context = {
+            'data': page_obj,
+            'search_query': search_query,
+            'sort': sort,
+            'direction': direction,
+            'per_page': per_page,
+            'page_number': page_number,
+            'total_pages': paginator.num_pages,
+        }
+
+        return render(request, 'doctors.html', context)
 
             

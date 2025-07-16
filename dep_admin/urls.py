@@ -17,4 +17,5 @@ urlpatterns = [
     path('access_control', views.access_control_view, name='access_control'),
     path('dop', views.doctors_opinion_view, name='dop'),
     path('dop_export', views.dop_export, name='dop_export'),
+    path('doctors_data', views.doctors_data, name='doctors_data'),
 ]
