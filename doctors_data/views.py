@@ -45,7 +45,7 @@ def dd_form(request):
             id = dr_id,
             name = dr_name,
             speciality = dr_speciality,
-            Designation = dr_designation
+            designation = dr_designation
         )
         
         for c in chamber_data:
