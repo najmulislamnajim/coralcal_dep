@@ -774,4 +774,42 @@ def doctors_data(request):
 
         return render(request, 'doctors.html', context)
 
-            
+@login_required
+def doctors_data_export(request):
+    wb = openpyxl.Workbook()
+
+    # --- Sheet 1: Doctors ---
+    ws_doctors = wb.active
+    ws_doctors.title = "Doctors"
+    ws_doctors.append(['ID', 'Name', 'Speciality', 'Designation'])
+
+    doctors = Doctor.objects.all()
+    for doc in doctors:
+        ws_doctors.append([doc.id, doc.name, doc.speciality, doc.designation])
+
+    # --- Sheet 2: Chambers ---
+    ws_chambers = wb.create_sheet(title="Chambers")
+    ws_chambers.append(['Doctor ID', 'Doctor Name', 'Address', 'Phone', 'Division', 'District', 'Upazila', 'Thana'])
+
+    chambers = Chamber.objects.select_related('doctor').all()
+    for ch in chambers:
+        ws_chambers.append([
+            ch.doctor.id,
+            ch.doctor.name,
+            ch.address,
+            ch.phone,
+            ch.division,
+            ch.district,
+            ch.upazila,
+            ch.thana
+        ])
+
+    # Set response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=doctors_and_chambers.xlsx'
+    wb.save(response)
+    return response
+
+       
