@@ -91,6 +91,13 @@
                   <p>Gondhoraj</p>
                 </div>
                   {% endif %}
+
+                {% if 'kamini' in obj.first_flower_plant or 'kamini' in obj.second_flower_plant or 'kamini' in obj.third_flower_plant %}
+                <div>
+                  <img src="{% static 'images/flower/kamini.png' %}" alt="kamini" class="object-cover w-full h-32">
+                  <p>kamini</p>
+                </div>
+                  {% endif %}
               </div>
             </div>
 
