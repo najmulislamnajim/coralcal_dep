@@ -366,25 +366,20 @@ def download_anniverysary(request):
         messages.error(request, "No images found in this directory.")
         return redirect('anniversary')
     
-    # Create Excel file in memory
-    excel_buffer = BytesIO()
+    # Create a new workbook and add a worksheet
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = "Anniversary Data"
+    
+    # Define the header row
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Anniversary Date']
     worksheet.append(headers)
-
-    queryset = Anniversary.objects.select_related('territory')
-    try:
-        profile = request.user.userprofile
-        if profile.user_type == 'zone':
-            queryset = queryset.filter(territory__zone_name=profile.zone_name)
-        elif  profile.user_type == 'region':
-            queryset = queryset.filter(territory__region_name=profile.region_name)
-    except UserProfile.DoesNotExist:
-        if not request.user.is_superuser:
-            queryset = Anniversary.objects.none()
-    for obj in queryset:
+    # Get data using the utils function
+    data = utils.filter_anniversary_data(request)
+    # Collect image paths for filtering
+    image_paths = set()
+    # Populate the worksheet with data
+    for obj in data:
         row = [
             obj.dr_id,
             obj.dr_name,
@@ -395,22 +390,26 @@ def download_anniverysary(request):
             obj.anniversary_date
         ]
         worksheet.append(row)
-
-    workbook.save(excel_buffer)
-    excel_buffer.seek(0)
+        if obj.image:  # Check if image exists
+            image_path = os.path.join(settings.MEDIA_ROOT, obj.image.name)
+            if os.path.exists(image_path):
+                image_paths.add(image_path)
+                
+    # Save the workbook to a BytesIO (in memory) object
+    buffer =BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
     
     # Create zip in memory
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        # Add all files from the folder
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
-                zip_file.write(file_path, relative_path)
-
+        # Add filteres images to the zip file
+        for image_path in image_paths:
+            relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
+            zip_file.write(image_path, relative_path)
+            
         # Add the Excel file
-        zip_file.writestr('anniversary_data.xlsx', excel_buffer.getvalue())
+        zip_file.writestr('anniversary_data.xlsx', buffer.getvalue())
 
     zip_buffer.seek(0)
     response = HttpResponse(zip_buffer, content_type='application/zip')
