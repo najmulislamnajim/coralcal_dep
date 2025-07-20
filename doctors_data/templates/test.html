@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_header.html' %}
 {% load static %}
 {% block head_title %}Doctor's Data | CoralCal Doctor Engagement Platform{% endblock %}
 
@@ -9,6 +9,9 @@
       <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
         Doctor Entry Form
       </h2>
+      <div class="flex gap-2">
+        <a href="{% url 'home' %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+      </div>
     </div>
 
     <div id="main-container" class="border border-border p-4 rounded-md">
