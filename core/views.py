@@ -52,8 +52,8 @@ def territory_home(request):
         'knowledge_series': {'label': 'Knowledge Series', 'url_name': 'book_choice', 'is_active': access_control_states['knowledge_series']},
         'gift_catalogs': {'label': 'Gift Catalogs', 'url_name': 'gift_choice', 'is_active': access_control_states['gift_catalogs']},
         'anniversary': {'label': 'Enlighten Together', 'url_name': 'anniversary_form', 'is_active': access_control_states['anniversary']},
-        'green_corner': {'label': 'Green Corner', 'url_name': 'rgc_upload', 'is_active': access_control_states['green_corner']},
-        'doctors_opinion': {'label': "Doctor's Opinion", 'url_name': 'do_form', 'is_active': access_control_states['doctors_opinion']},
-        'doctors_data': {'label': "Doctor's Data", 'url_name': 'dd_form', 'is_active': access_control_states['doctors_data']}
+        'green_corner': {'label': 'Radiant Green Corner', 'url_name': 'rgc_upload', 'is_active': access_control_states['green_corner']},
+        'doctors_opinion': {'label': "Doctor Opinion", 'url_name': 'do_form', 'is_active': access_control_states['doctors_opinion']},
+        'doctors_data': {'label': "Doctor Chamber Info", 'url_name': 'dd_form', 'is_active': access_control_states['doctors_data']}
     }
     return render(request, 'home.html', {'events': events})
