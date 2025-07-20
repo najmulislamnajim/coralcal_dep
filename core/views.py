@@ -54,5 +54,6 @@ def territory_home(request):
         'anniversary': {'label': 'Enlighten Together', 'url_name': 'anniversary_form', 'is_active': access_control_states['anniversary']},
         'green_corner': {'label': 'Green Corner', 'url_name': 'rgc_upload', 'is_active': access_control_states['green_corner']},
         'doctors_opinion': {'label': "Doctor's Opinion", 'url_name': 'do_form', 'is_active': access_control_states['doctors_opinion']},
+        'doctors_data': {'label': "Doctor's Data", 'url_name': 'dd_form', 'is_active': access_control_states['doctors_data']}
     }
     return render(request, 'home.html', {'events': events})
