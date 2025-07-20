@@ -26,7 +26,7 @@ def filter_anniversary_data(request):
                 Q(dr_name__icontains = search_query) |
                 Q(anniversary_date__icontains = search_query) |
                 Q(territory__territory__icontains = search_query) |
-                Q(territory__terrtory_name__icontains = search_query) |
+                Q(territory__territory_name__icontains = search_query) |
                 Q(territory__region_name__icontains = search_query) |
                 Q(territory__zone_name__icontains = search_query)
             )
@@ -34,9 +34,8 @@ def filter_anniversary_data(request):
             data = data.filter(
                 Q(dr_id__icontains = search_query) |
                 Q(dr_name__icontains = search_query) |
-                Q(anniversary_date__icontains = search_query) |
                 Q(territory__territory__icontains = search_query) |
-                Q(territory__terrtory_name__icontains = search_query) |
+                Q(territory__territory_name__icontains = search_query) |
                 Q(territory__region_name__icontains = search_query) |
                 Q(territory__zone_name__icontains = search_query)
             )
@@ -63,5 +62,4 @@ def filter_anniversary_data(request):
     
     if sort_by:
         data = data.order_by(sort_by)
-    
     return data
