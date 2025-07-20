@@ -355,7 +355,7 @@ def anniversary(request):
 @login_required 
 def export_anniversary(request):
     """
-    Export the Gift Catalogs data to an Excel file.
+    Export the Anniversary(Enlighted Together) data to an Excel file.
     """
 
     # Create a new workbook and add a worksheet
@@ -367,7 +367,7 @@ def export_anniversary(request):
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Anniversary Date']
     worksheet.append(headers)
     
-    # Populate the worksheet with data
+    # Get data and filter it based on the user's profile
     queryset = Anniversary.objects.select_related('territory')
     try:
         profile = request.user.userprofile
@@ -378,6 +378,41 @@ def export_anniversary(request):
     except UserProfile.DoesNotExist:
         if not request.user.is_superuser:
             queryset = Anniversary.objects.none()
+    
+    # Filter data based on search query
+    search_query = request.GET.get('search', '')
+    if search_query:
+        queryset = queryset.filter(
+            Q(dr_id__icontains=search_query) |
+            Q(dr_name__icontains=   search_query) |
+            Q(territory__territory__icontains=search_query) |
+            Q(territory__territory_name__icontains=search_query) |
+            Q(territory__region_name__icontains=search_query) |
+            Q(territory__zone_name__icontains=search_query) |
+            Q(anniversary_date__icontains=search_query)
+        )
+    
+    # Filter data based on sort and direction
+    sort = request.GET.get("sort", "territory")
+    direction = request.GET.get("direction", "asc")
+    sort_by = sort
+    if sort == "territory":
+        sort_by = "territory__territory"
+    elif sort == "territory_name":
+        sort_by = "territory__territory_name"
+    elif sort == "region":
+        sort_by = "territory__region_name"
+    elif sort == "zone":
+        sort_by = "territory__zone_name"
+    elif sort == "dr_id":
+        sort_by = "dr_id"
+    elif sort == "dr_name":
+        sort_by = "dr_name"
+    if direction == "desc":
+        sort_by = f"-{sort_by}"
+    queryset = queryset.order_by(sort_by)
+    
+    # Populate the worksheet with data
     for obj in queryset:
         row = [
             obj.dr_id,
