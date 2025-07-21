@@ -311,11 +311,6 @@ def green_corner(request):
 
 @login_required 
 def export_rgc(request):
-    """
-    Export the knowledge series data to an Excel file.
-    """
-
-    # Create a new workbook and add a worksheet
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = "Radiant Green Corner Data"
@@ -323,19 +318,9 @@ def export_rgc(request):
     # Define the header row
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Flower Plants', 'Medicinal Plants']
     worksheet.append(headers)
-    
+    data = utils.filter_green_corner_data(request)
     # Populate the worksheet with data
-    queryset = GreenCorner.objects.select_related('territory')
-    try:
-        profile = request.user.userprofile
-        if profile.user_type == 'zone':
-            queryset = queryset.filter(territory__zone_name=profile.zone_name)
-        elif  profile.user_type == 'region':
-            queryset = queryset.filter(territory__region_name=profile.region_name)
-    except UserProfile.DoesNotExist:
-        if not request.user.is_superuser:
-            queryset = GreenCorner.objects.none()
-    for obj in queryset:
+    for obj in data:
         flower_plants = f'{obj.first_flower_plant}, {obj.second_flower_plant}, {obj.third_flower_plant}.'
         medicinal_plants = f'{obj.first_medicinal_plant}, {obj.second_medicinal_plant}.'
         row = [
@@ -350,7 +335,6 @@ def export_rgc(request):
         ]
         worksheet.append(row)
     
-    # Save the workbook to a BytesIO object
     buffer = BytesIO()
     workbook.save(buffer)
     buffer.seek(0)
