@@ -360,12 +360,6 @@ def export_anniversary(request):
 
 @login_required 
 def download_anniverysary(request):
-    folder_path = os.path.join(settings.MEDIA_ROOT, 'anniversary_images')
-    
-    if not os.path.exists(folder_path):
-        messages.error(request, "No images found in this directory.")
-        return redirect('anniversary')
-    
     # Create a new workbook and add a worksheet
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
@@ -406,8 +400,7 @@ def download_anniverysary(request):
         # Add filteres images to the zip file
         for image_path in image_paths:
             relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
-            zip_file.write(image_path, relative_path)
-            
+            zip_file.write(image_path, relative_path)    
         # Add the Excel file
         zip_file.writestr('anniversary_data.xlsx', buffer.getvalue())
 
