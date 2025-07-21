@@ -100,31 +100,14 @@ def delete_knowledge_series_data(request, id):
     
 @login_required 
 def download_gift_catalogs(request):
-    folder_path = os.path.join(settings.MEDIA_ROOT, 'conference_images')
-    
-    if not os.path.exists(folder_path):
-        messages.error(request, "No images found in this directory.")
-        return redirect('gift_catalogs')
-    
-    # Create Excel file in memory
-    excel_buffer = BytesIO()
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
     worksheet.title = "Gift Catalogs Data"
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Gift Choice']
     worksheet.append(headers)
-
-    queryset = DrGiftCatalog.objects.select_related('territory')
-    try:
-        profile = request.user.userprofile
-        if profile.user_type == 'zone':
-            queryset = queryset.filter(territory__zone_name=profile.zone_name)
-        elif  profile.user_type == 'region':
-            queryset = queryset.filter(territory__region_name=profile.region_name)
-    except UserProfile.DoesNotExist:
-        if not request.user.is_superuser:
-            queryset = DrGiftCatalog.objects.none()
-    for obj in queryset:
+    data = utils.filter_gift_catalogs_data(request)
+    image_paths = set()
+    for obj in data:
         row = [
             obj.dr_id,
             obj.dr_name,
@@ -135,22 +118,21 @@ def download_gift_catalogs(request):
             obj.gift
         ]
         worksheet.append(row)
-
-    workbook.save(excel_buffer)
-    excel_buffer.seek(0)
+        if obj.conference_image:
+            image_path = os.path.join(settings.MEDIA_ROOT, obj.conference_image.name)
+            if os.path.exists(image_path):
+                image_paths.add(image_path)
+    buffer = BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
     
-    # Create zip in memory
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        # Add all files from the folder
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                relative_path = os.path.relpath(file_path, settings.MEDIA_ROOT)
-                zip_file.write(file_path, relative_path)
-
+        for image_path in image_paths:
+            relative_path = os.path.relpath(image_path, settings.MEDIA_ROOT)
+            zip_file.write(image_path, relative_path)
         # Add the Excel file
-        zip_file.writestr('gift_catalogs_data.xlsx', excel_buffer.getvalue())
+        zip_file.writestr('gift_catalogs_data.xlsx', buffer.getvalue())
 
     zip_buffer.seek(0)
     response = HttpResponse(zip_buffer, content_type='application/zip')
