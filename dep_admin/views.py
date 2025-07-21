@@ -159,10 +159,6 @@ def download_gift_catalogs(request):
 
 @login_required 
 def export_gift_catalogs(request):
-    """
-    Export the Gift Catalogs data to an Excel file.
-    """
-
     # Create a new workbook and add a worksheet
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
@@ -171,19 +167,9 @@ def export_gift_catalogs(request):
     # Define the header row
     headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Gift Choice']
     worksheet.append(headers)
-    
+    data = utils.filter_gift_catalogs_data(request)
     # Populate the worksheet with data
-    queryset = DrGiftCatalog.objects.select_related('territory')
-    try:
-        profile = request.user.userprofile
-        if profile.user_type == 'zone':
-            queryset = queryset.filter(territory__zone_name=profile.zone_name)
-        elif  profile.user_type == 'region':
-            queryset = queryset.filter(territory__region_name=profile.region_name)
-    except UserProfile.DoesNotExist:
-        if not request.user.is_superuser:
-            queryset = BookWishes.objects.none()
-    for obj in queryset:
+    for obj in data:
         row = [
             obj.dr_id,
             obj.dr_name,
@@ -214,44 +200,8 @@ def gift_catalogs(request):
         per_page = int(request.GET.get("per_page") or 10)
         sort = request.GET.get("sort", "territory")
         direction = request.GET.get("direction", "asc")
-        
-        data = DrGiftCatalog.objects.select_related('territory').all()
-        try:
-            profile = request.user.userprofile
-            if profile.user_type == 'zone':
-                data = data.filter(territory__zone_name=profile.zone_name)
-                print(profile.zone_name , "zone name")
-            elif  profile.user_type == 'region':
-                data = data.filter(territory__region_name=profile.region_name)
-        except UserProfile.DoesNotExist:
-            if not request.user.is_superuser:
-                data = DrGiftCatalog.objects.none()
-        if search_query:
-            data = data.filter(
-                Q(dr_id__icontains=search_query) |
-                Q(dr_name__icontains=search_query) |
-                Q(territory__territory__icontains=search_query) |
-                Q(territory__territory_name__icontains=search_query) |
-                Q(territory__region_name__icontains=search_query) |
-                Q(territory__zone_name__icontains=search_query) | 
-                Q(gift__icontains=search_query)
-            )
-        sort_by = sort
-        if sort_by == "territory":
-            sort_by = "territory__territory"
-        elif sort_by == "territory_name":
-            sort_by = "territory__territory_name"
-        elif sort_by == "region":
-            sort_by = "territory__region_name"
-        elif sort_by == "zone":
-            sort_by = "territory__zone_name"
-        elif sort_by == "dr_id":
-            sort_by = "dr_id"
-        elif sort_by == "dr_name":
-            sort_by = "dr_name"
-        if direction == "desc":
-            sort_by = f"-{sort_by}"
-        data = data.order_by(sort_by)
+        # Get data using the utils function
+        data = utils.filter_gift_catalogs_data(request)
         paginator = Paginator(data, per_page)
         page_obj = paginator.get_page(page_number)    
     return render(request, 'gift_catalogs.html',{'data':page_obj, 'search_query':search_query, 'per_page':per_page, 'sort':sort, 'direction':direction})  
