@@ -6,6 +6,7 @@ from knowledge_series.models import BookWishes
 from dr_gift_catalogs.models import DrGiftCatalog
 from green_corner.models import GreenCorner
 from doctors_opinion.models import DoctorOpinion, DoctorIndication
+from doctors_data.models import Doctor, Chamber
 
 def filter_knowledge_series_data(request):
     data = BookWishes.objects.select_related('territory').all()
@@ -257,4 +258,32 @@ def filter_doctors_opinion_data(request):
         sort_by = f"-{sort_by}" 
     data = data.order_by(sort_by)
     
+    return data
+
+def filter_doctors_data(request):
+    data = Doctor.objects.all()
+    # Filter based on search query
+    search_query = request.GET.get("search","")
+    if search_query:
+        data = data.filter(
+            Q(id__icontains=search_query) |
+            Q(name__icontains=search_query) |
+            Q(speciality__icontains=search_query) |
+            Q(designation__icontains=search_query) |
+            Q(chambers__district__icontains=search_query) |
+            Q(chambers__upazila__icontains=search_query) |
+            Q(chambers__thana__icontains=search_query) |
+            Q(chambers__address__icontains=search_query) |
+            Q(chambers__phone__icontains=search_query)
+        ).distinct()
+    # Sorting
+    sort = request.GET.get("sort","dr_id")
+    direction = request.GET.get("direction","asc")
+    sort_by = {
+        "dr_id": "id",
+        "dr_name": "name"
+    }.get(sort, sort)
+    if direction == "desc":
+        sort_by = f"-{sort_by}"    
+    data = data.order_by(sort_by)
     return data
