@@ -249,8 +249,8 @@
                           <span class="page-link">{{ num }}</span>
                       </li>
                       {% elif num > data.number|add:'-3' and num < data.number|add:'3' %}
-                      <li  class="button button--md button--outline">
-                          <a class="page-link" href="?page={{ num }}&per_page={{ per_page }}&search={{ search_query }}">{{ num }}</a>
+                      <li  class="page-item">
+                          <a class="button button--md button--outline" href="?page={{ num }}&per_page={{ per_page }}&search={{ search_query }}">{{ num }}</a>
                       </li>
                       {% endif %}
                   {% endfor %}
