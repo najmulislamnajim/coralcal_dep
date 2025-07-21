@@ -438,35 +438,8 @@ def doctors_data(request):
         direction = request.GET.get('direction', 'asc')
         per_page = int(request.GET.get('per_page', 10))
         page_number = int(request.GET.get('page_number', 1))
-
         # Base queryset
-        data = Doctor.objects.all()
-
-        # Filtering (search)
-        if search_query:
-            data = data.filter(
-                Q(id__icontains=search_query) |
-                Q(name__icontains=search_query) |
-                Q(speciality__icontains=search_query) |
-                Q(designation__icontains=search_query) |
-                Q(chambers__district__icontains=search_query) |
-                Q(chambers__upazila__icontains=search_query) |
-                Q(chambers__thana__icontains=search_query) |
-                Q(chambers__address__icontains=search_query) |
-                Q(chambers__phone__icontains=search_query)
-            ).distinct()
-
-        # Sorting
-        sort_by = {
-            "dr_id": "id",
-            "dr_name": "name"
-        }.get(sort, sort)
-
-        if direction == "desc":
-            sort_by = f"-{sort_by}"
-
-        data = data.order_by(sort_by)
-
+        data = utils.filter_doctors_data(request)
         # Pagination
         paginator = Paginator(data, per_page)
         page_obj = paginator.get_page(page_number)
@@ -507,7 +480,7 @@ def doctors_data_export(request):
     ws_doctors.title = "Doctors"
     ws_doctors.append(['ID', 'Name', 'Speciality', 'Designation'])
 
-    doctors = Doctor.objects.all()
+    doctors = utils.filter_doctors_data(request)
     for doc in doctors:
         ws_doctors.append([doc.id, doc.name, doc.speciality, doc.designation])
 
