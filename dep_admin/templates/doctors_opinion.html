@@ -113,17 +113,19 @@
                 class="input"
                 placeholder="Search..."
                 value="{{ search_query }}"
-              />
+                />
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="direction" value="{{ direction }}">
             </form>
           </div>
 
           <!-- right section -->
           <div class="right-actions flex items-center justify-center md:justify-start flex-wrap gap-4">
-            <a href="{% url 'dop_export' %}" class="button button--md flex-1 button--primary"><i data-lucide="download"></i> Download</a>
+            <a href="{% url 'dop_export' %}?search={{ search_query|urlencode }}&sort={{ sort }}&direction={{ direction }}&per_page={{ per_page }}" class="button button--md flex-1 button--primary"><i data-lucide="download"></i> Download</a>
             <button class="button button--md flex-1 button--secondary copy-table-data" id="copyTableData" onclick="copyTableData('doctorTable')">
               <i data-lucide="copy"></i> Copy
             </button>
-            <a href="{% url 'dop_export' %}" class="button button--md flex-1 button--outline"><i data-lucide="file"></i> Excel</a> 
+            <a href="{% url 'dop_export' %}?search={{ search_query|urlencode }}&sort={{ sort }}&direction={{ direction }}&per_page={{ per_page }}" class="button button--md flex-1 button--outline"><i data-lucide="file"></i> Excel</a> 
           </div>
         </div>
 
@@ -134,7 +136,7 @@
                   <tr class="table-row">
                       <th class="table-head">#</th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=dr_id&direction={% if sort == 'dr_id' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=dr_id&direction={% if sort == 'dr_id' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Dr. ID
                           {% if sort == 'dr_id' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
@@ -144,7 +146,7 @@
                           </a>
                       </th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=dr_name&direction={% if sort == 'dr_name' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=dr_name&direction={% if sort == 'dr_name' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Dr. Name
                           {% if sort == 'dr_name' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
@@ -160,7 +162,7 @@
                           Dr. Mobile
                       </th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=territory&direction={% if sort == 'territory' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=territory&direction={% if sort == 'territory' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Territory
                           {% if sort == 'territory' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
@@ -170,7 +172,7 @@
                           </a>
                       </th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=territory_name&direction={% if sort == 'territory_name' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=territory_name&direction={% if sort == 'territory_name' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Territory Name
                           {% if sort == 'territory_name' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
@@ -180,7 +182,7 @@
                           </a>
                       </th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=region&direction={% if sort == 'region' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=region&direction={% if sort == 'region' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Region
                           {% if sort == 'region' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
@@ -190,7 +192,7 @@
                           </a>
                       </th>
                       <th class="table-head">
-                          <a class="button button--md button--ghost flex" href="?sort=zone&direction={% if sort == 'zone' and direction == 'asc' %}desc{% else %}asc{% endif %}">
+                          <a class="button button--md button--ghost flex" href="?search={{ search_query|urlencode }}&sort=zone&direction={% if sort == 'zone' and direction == 'asc' %}desc{% else %}asc{% endif %}">
                           Zone
                           {% if sort == 'zone' %}
                               <i data-lucide="chevron-{% if direction == 'asc' %}up{% else %}down{% endif %}"></i>
