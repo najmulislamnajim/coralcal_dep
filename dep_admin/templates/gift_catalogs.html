@@ -240,8 +240,8 @@
 
                   {% for num in data.paginator.page_range %}
                       {% if data.number == num %}
-                      <li class="button button--md button--primary">
-                          <span class="page-link">{{ num }}</span>
+                      <li class="page-item">
+                          <span class="button button--md button--outline">{{ num }}</span>
                       </li>
                       {% elif num > data.number|add:'-3' and num < data.number|add:'3' %}
                       <li  class="button button--md button--outline">
