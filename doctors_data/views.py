@@ -22,18 +22,18 @@ def dd_form(request):
         # Basic validation
         if not all([dr_id, dr_name, dr_speciality, dr_designation]):
             messages.error(request, "Please fill out all required doctor fields.")
-            return render(request, 'test.html')
+            return render(request, 'doctor_data.html')
 
         chamber_data = []
         for i in range(len(address)):
             if not (address[i] and phone[i] and district[i] and upazila[i] and thana[i]):
                 messages.error(request, f"Please fill out all chamber fields for chamber #{i+1}.")
-                return render(request, 'test.html')
+                return render(request, 'doctor_data.html')
 
             if not phone[i].startswith('01') or len(phone[i]) != 11:
                 print(phone[i])
                 messages.error(request, f"Invalid phone number for chamber #{i+1}. Must be 11 digits and start with '01'.")
-                return render(request, 'test.html')
+                return render(request, 'doctor_data.html')
             
 
             chamber_data.append({
@@ -56,7 +56,7 @@ def dd_form(request):
 
         messages.success(request, "Doctor and chambers saved successfully!")
         return redirect('dd_form')
-    return render(request, 'test.html')
+    return render(request, 'doctor_data.html')
 
 @login_required
 def delete_doctors_data(request, doctor_id):
