@@ -486,7 +486,7 @@ def doctors_data_export(request):
 
     # --- Sheet 2: Chambers ---
     ws_chambers = wb.create_sheet(title="Chambers")
-    ws_chambers.append(['Doctor ID', 'Doctor Name', 'Address', 'Phone', 'Division', 'District', 'Upazila', 'Thana'])
+    ws_chambers.append(['Doctor ID', 'Doctor Name', 'Address', 'Phone', 'District', 'Upazila', 'Thana'])
 
     chambers = Chamber.objects.select_related('doctor').all()
     for ch in chambers:
@@ -495,7 +495,6 @@ def doctors_data_export(request):
             ch.doctor.name,
             ch.address,
             ch.phone,
-            ch.division,
             ch.district,
             ch.upazila,
             ch.thana
