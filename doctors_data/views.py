@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from core.models import UserProfile
+from core.utils import redirect_url
 
 # Create your views here.
 def dd_form(request):
@@ -63,13 +64,5 @@ def delete_doctors_data(request, doctor_id):
     obj = get_object_or_404(Doctor, id=doctor_id)
     obj.delete()
     messages.success(request, "Doctor and associated chambers deleted successfully!")
-    if not request.user.is_superuser:
-        try:
-            profile = request.user.userprofile
-            if profile.user_type == 'zone' or profile.user_type == 'region':
-                return redirect('doctors_data')
-            else:
-                return redirect('dd_form')
-        except UserProfile.DoesNotExist:
-            return redirect('dd_form')
-    return redirect('doctors_data')
+    redirection_url = redirect_url(request, 'doctors_data', 'doctors_data', 'dd_form')
+    return redirect(redirection_url)
