@@ -135,6 +135,7 @@
                           Designation
                       </th>
                       <th class="table-head">Chamber List</th>
+                      <th class="table-head">Action</th>
                   </tr>
               </thead>
               <tbody class="table-body">
@@ -157,7 +158,12 @@
                         >
                         View Chambers
                         </button>
-                        </td>
+                      </td>
+                      <td class="table-cell">
+                        <a class="button button--icon button--outline" href="{% url 'edit_doctors_data' item.id %}"><i data-lucide="edit" class="text-primary"></i></a>
+                        
+                        <a class="button button--icon button--outline" href="{% url 'delete_doctors_data' item.id %}"><i data-lucide="trash" class="text-destructive"></i></a>
+                      </td>
                   </tr>
                   {% endfor %}
               </tbody>
