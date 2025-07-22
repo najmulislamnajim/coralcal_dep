@@ -1,16 +1,18 @@
 {% extends 'base_header.html' %}
 {% load static %}
-{% block head_title %}Edit Doctor | CoralCal Doctor Engagement Platform{% endblock %}
+{% block head_title %}Edit Doctor Chamber Data | CoralCal Doctor Engagement Platform{% endblock %}
 
 {% block content %}
 <div class="bg-background p-8 rounded-md border border-border shadow-sm max-w-2xl mx-auto my-4">
   <div class="card">
     <div class="mb-6 flex justify-between gap-5 text-center">
       <h2 class="text-sm sm:text-base md:text-lg font-bold text-primary text-center">
-        Edit Doctor Chamber Info
+        Edit Doctor Chamber Info Entry
       </h2>
       <div class="flex gap-2">
+        {% if back_url %}
         <a href="{% url back_url %}" class="button button--sm button--primary"><i data-lucide="arrow-left"></i> Back</a>
+        {% endif %}
       </div>
     </div>
 
@@ -19,32 +21,31 @@
         <div class="form-header">
           <form id="uploadForm" method="post" class="flex flex-col gap-6" enctype="multipart/form-data">
             {% csrf_token %}
-
             <div class="form-item">
               <label class="label" for="dr_id">RPL ID</label>
-              <input type="text" id="dr_id" name="dr_id" maxlength="10" class="input" required placeholder="Enter RPL ID" value="{{ obj.id }}" readonly />
+              <input type="text" id="dr_id" name="dr_id" maxlength="10" class="input" required placeholder="Enter RPL ID" value="{{obj.id}}" readonly disabled />
             </div>
 
             <div class="form-item">
               <label class="label" for="dr_name">Name</label>
-              <input type="text" id="dr_name" name="dr_name" maxlength="100" class="input" required placeholder="Enter Professional Name" value="{{ obj.name }}" />
+              <input type="text" id="dr_name" name="dr_name" maxlength="100" class="input" required placeholder="Enter Professional Name" value="{{obj.name}}" />
             </div>
 
             <div class="form-item">
               <label class="label" for="dr_speciality">Speciality</label>
-              <input type="text" id="dr_speciality" name="dr_speciality" maxlength="255" class="input" required placeholder="Enter Speciality" value="{{ obj.speciality }}" />
+              <input type="text" id="dr_speciality" name="dr_speciality" maxlength="255" class="input" required placeholder="Enter Speciality : Medicine, Surgery, etc." value="{{obj.speciality}}" />
             </div>
 
             <div class="form-item">
               <label class="label" for="dr_designation">Designation</label>
-              <textarea id="dr_designation" name="dr_designation" maxlength="500" rows="2" class="input resize-none auto-expand" required placeholder="Enter Designation">{{ obj.designation }}</textarea>
+              <textarea id="dr_designation" name="dr_designation" maxlength="500" rows="2" class="input resize-none auto-expand" required placeholder="Enter Designation: Professor, Department of Surgery, DMC." >{{obj.designation}}</textarea>
               <div class="text-right text-xs mt-1">
-                <span id="designationCount">{{ obj.designation|length }}</span>/500 characters
+                <span id="designationCount">0</span>/500 characters
               </div>
             </div>
 
             <div class="form-item">
-              <label class="label">Chambers</label>
+              <label class="label">Chamber</label>
               <div id="indication-wrapper" class="flex flex-col gap-4">
                 {% for chamber in chambers %}
                 <div class="border p-4 rounded-md flex flex-col gap-4 bg-gray-50">
@@ -87,30 +88,47 @@
               </button>
             </div>
 
-            <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">Save Changes</button>
+            <button type="submit" class="button button--md button--primary" onclick="submitForm(event)">
+                Save Changes
+            </button>
           </form>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Error Toasts and Modals (unchanged) -->
+  <div id="errorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+      <h3 class="text-lg font-semibold text-red-600 mb-4">Form Error</h3>
+      <p id="errorModalMessage" class="text-gray-800 mb-6"></p>
+      <div class="text-right">
+        <button onclick="closeErrorModal()" class="button button--sm button--primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="inlineErrorBox" class="hidden border border-red-300 bg-red-100 text-red-700 p-4 rounded-md relative">
+    <button onclick="closeInlineError()" class="absolute top-2 right-2 text-red-700 hover:text-red-900">
+      <i data-lucide="x-circle"></i>
+    </button>
+    <p id="inlineErrorMessage" class="text-sm"></p>
+  </div>
+
+  <div id="flyingErrorToast" class="hidden fixed top-6 right-6 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300 ease-in-out">
+    <div class="flex items-center justify-between gap-4">
+      <p id="flyingErrorMessage" class="text-sm"></p>
+      <button onclick="closeFlyingError()" class="text-red-600 hover:text-red-800">
+        <i data-lucide="x-circle"></i>
+      </button>
+    </div>
+  </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <script>
-const allDistricts = [
-  "Bagerhat", "Bandarban", "Barguna", "Barisal", "Bhola", "Bogura",
-  "Brahmanbaria", "Chandpur", "Chapainawabganj", "Chattogram", "Chuadanga",
-  "Cox's Bazar", "Cumilla", "Dhaka", "Dinajpur", "Faridpur", "Feni",
-  "Gaibandha", "Gazipur", "Gopalganj", "Habiganj", "Jamalpur", "Jashore",
-  "Jhenaidah", "Joypurhat", "Khagrachhari", "Khulna", "Kishoreganj",
-  "Kurigram", "Kushtia", "Lakshmipur", "Lalmonirhat", "Magura", "Manikganj",
-  "Meherpur", "Moulvibazar", "Munshiganj", "Mymensingh", "Naogaon",
-  "Narayanganj", "Narsingdi", "Natore", "Netrokona", "Nilphamari",
-  "Noakhali", "Pabna", "Panchagarh", "Patuakhali", "Pirojpur", "Rajbari",
-  "Rajshahi", "Rangamati", "Rangpur", "Satkhira", "Shariatpur", "Sherpur",
-  "Sirajganj", "Sunamganj", "Sylhet", "Tangail", "Thakurgaon"
-];
 
 function addChamber() {
   const wrapper = document.getElementById('indication-wrapper');
@@ -126,6 +144,7 @@ function addChamber() {
         <span class="chamberCount">0</span>/500 characters
       </div>
     </div>
+
     <div>
       <label class="label">Chamber Phone</label>
       <input type="text" name="chamber_phone[]" class="input" placeholder="Enter chamber phone number" required />
@@ -134,31 +153,37 @@ function addChamber() {
       <label class="label">District</label>
       <select name="district[]" class="input district-select" required>
         <option value="">Select District</option>
-        ${allDistricts.map(d => `<option value="${d}">${d}</option>`).join('')}
+        ${getAllDistricts().map(d => `<option value="${d}">${d}</option>`).join('')}
       </select>
     </div>
+
     <div>
       <label class="label">Upazila</label>
       <input type="text" name="upazila[]" class="input" placeholder="Enter upazila" required />
     </div>
+
     <div>
       <label class="label">Thana</label>
       <input type="text" name="thana[]" class="input" placeholder="Enter thana" required />
     </div>
+
     <button type="button" class="text-red-500 hover:text-red-700 self-end" onclick="removeChamber(this)">
       <i data-lucide="x-circle"></i> Remove
     </button>
   `;
 
   wrapper.appendChild(container);
-  new Choices(container.querySelector('.district-select'), {
+
+  
+  const select = container.querySelector('.district-select');
+  new Choices(select, {
     searchEnabled: true,
     itemSelectText: '',
     placeholderValue: 'Search district...',
   });
 
   if (typeof lucide !== 'undefined') lucide.createIcons();
-  setupTextareaFeatures();
+  setupDivisionListeners();
 }
 
 function removeChamber(button) {
@@ -167,8 +192,27 @@ function removeChamber(button) {
   if (wrapper.children.length > 1) {
     wrapper.removeChild(container);
   } else {
-    alert("At least one chamber is required.");
+    showFlyingError("At least one chamber is required.");
   }
+}
+
+function setupDivisionListeners() {
+  const allDivisionDropdowns = document.querySelectorAll('.division-dropdown');
+  allDivisionDropdowns.forEach(select => {
+    select.onchange = function () {
+      const selectedDivision = this.value;
+      const districtSelect = this.closest('div.border').querySelector('.district-dropdown');
+      districtSelect.innerHTML = '<option value="">Select District</option>';
+      if (divisions[selectedDivision]) {
+        divisions[selectedDivision].forEach(district => {
+          const option = document.createElement('option');
+          option.value = district;
+          option.textContent = district;
+          districtSelect.appendChild(option);
+        });
+      }
+    };
+  });
 }
 
 function setupTextareaFeatures() {
@@ -193,20 +237,63 @@ function setupTextareaFeatures() {
   });
 }
 
+function showFlyingError(message) {
+  const toast = document.getElementById('flyingErrorToast');
+  const text = document.getElementById('flyingErrorMessage');
+  text.textContent = message;
+  toast.classList.remove('hidden');
+  toast.classList.add('opacity-100');
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  setTimeout(() => { closeFlyingError(); }, 3000);
+}
+
+function closeFlyingError() {
+  document.getElementById('flyingErrorToast').classList.add('hidden');
+}
+
 function submitForm(event) {
   event.preventDefault();
-  const fields = ['dr_id', 'dr_name', 'dr_speciality', 'dr_designation'];
-  const isValid = fields.every(id => document.getElementById(id).value.trim() !== '') &&
-    [...document.querySelectorAll('[name="chamber_address[]"], [name="chamber_phone[]"], [name="district[]"], [name="upazila[]"], [name="thana[]"]')]
-      .every(field => field.value.trim() !== '');
+  const drId = document.getElementById('dr_id').value.trim();
+  const drName = document.getElementById('dr_name').value.trim();
+  const drSpecialty = document.getElementById('dr_speciality').value.trim();
+  const drDesignation = document.getElementById('dr_designation').value.trim();
+  const chamberAddresses = document.querySelectorAll('[name="chamber_address[]"]');
+  const chamberPhones = document.querySelectorAll('[name="chamber_phone[]"]');
+  const districts = document.querySelectorAll('[name="district[]"]');
+  const upazilas = document.querySelectorAll('[name="upazila[]"]');
+  const thanas = document.querySelectorAll('[name="thana[]"]');
 
-  if (!isValid) {
-    alert("Please fill all required fields correctly.");
+  const valid = [
+    drId, drName, drSpecialty, drDesignation
+  ].every(v => v !== '') &&
+    [...chamberAddresses].every(e => e.value.trim() !== '') &&
+    [...chamberPhones].every(e => /^01\d{9}$/.test(e.value.trim())) &&
+    [...districts, ...upazilas, ...thanas].every(e => e.value.trim() !== '');
+
+  if (!valid) {
+    showFlyingError("Please fill out all required doctor and chamber fields correctly.");
     return;
   }
 
   document.getElementById('uploadForm').submit();
 }
+
+function getAllDistricts() {
+    return [
+      "Bagerhat", "Bandarban", "Barguna", "Barisal", "Bhola", "Bogura",
+      "Brahmanbaria", "Chandpur", "Chapainawabganj", "Chattogram", "Chuadanga",
+      "Cox's Bazar", "Cumilla", "Dhaka", "Dinajpur", "Faridpur", "Feni",
+      "Gaibandha", "Gazipur", "Gopalganj", "Habiganj", "Jamalpur", "Jashore",
+      "Jhenaidah", "Joypurhat", "Khagrachhari", "Khulna", "Kishoreganj",
+      "Kurigram", "Kushtia", "Lakshmipur", "Lalmonirhat", "Magura", "Manikganj",
+      "Meherpur", "Moulvibazar", "Munshiganj", "Mymensingh", "Naogaon",
+      "Narayanganj", "Narsingdi", "Natore", "Netrokona", "Nilphamari",
+      "Noakhali", "Pabna", "Panchagarh", "Patuakhali", "Pirojpur", "Rajbari",
+      "Rajshahi", "Rangamati", "Rangpur", "Satkhira", "Shariatpur", "Sherpur",
+      "Sirajganj", "Sunamganj", "Sylhet", "Tangail", "Thakurgaon"
+    ];
+  }
+
 
 window.addEventListener('DOMContentLoaded', () => {
   setupTextareaFeatures();
