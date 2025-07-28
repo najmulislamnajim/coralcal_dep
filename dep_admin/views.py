@@ -316,7 +316,7 @@ def export_rgc(request):
     worksheet.title = "Radiant Green Corner Data"
     
     # Define the header row
-    headers = ['Dr. RPL ID', 'Dr. Name', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Flower Plants', 'Medicinal Plants']
+    headers = ['Dr. RPL ID', 'Dr. Name', 'Dr. Address', 'RM Mobile', 'Territory ID', 'Territory Name', 'Region', 'Zone', 'Flower Plants', 'Medicinal Plants']
     worksheet.append(headers)
     data = utils.filter_green_corner_data(request)
     # Populate the worksheet with data
@@ -326,6 +326,8 @@ def export_rgc(request):
         row = [
             obj.dr_id,
             obj.dr_name,
+            obj.dr_address,
+            obj.rm_phone,
             obj.territory.territory,
             obj.territory.territory_name,
             obj.territory.region_name,
