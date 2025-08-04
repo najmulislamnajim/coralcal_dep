@@ -45,13 +45,16 @@ def dd_form(request):
                 'upazila': upazila[i],
                 'thana': thana[i],
             })
-
-        doctor = Doctor.objects.create(
-            id = dr_id,
-            name = dr_name,
-            speciality = dr_speciality,
-            designation = dr_designation
-        )
+        try:
+            doctor = Doctor.objects.create(
+                id = dr_id,
+                name = dr_name,
+                speciality = dr_speciality,
+                designation = dr_designation
+            )
+        except Exception as e:
+            messages.error(request, f"{e}")
+            return redirect('dd_form')
         
         for c in chamber_data:
             Chamber.objects.create(doctor=doctor, **c)
